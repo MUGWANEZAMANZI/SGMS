@@ -77,10 +77,14 @@ public abstract class Student {
     }
 
     public double calculateAverageGrade() {
-        return grades.stream()
-                .mapToDouble(Grade::value)
-                .average()
-                .orElse(0.0);
+        if (grades.isEmpty()) {
+            return 0.0;
+        }
+        double total = 0.0;
+        for (Grade grade : grades) {
+            total += grade.value();
+        }
+        return total / grades.size();
     }
 
     public boolean isPassing() {
