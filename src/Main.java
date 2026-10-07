@@ -89,8 +89,7 @@ public class Main {
             return;
         }
 
-        IO.println("\nStudent: %s - %s".formatted(
-                student.getStudentId(), student.getName()));
+        IO.println("\nStudent: %s - %s".formatted(student.getStudentId(), student.getName()));
         IO.println("Current average: %.2f%%".formatted(student.calculateAverageGrade()));
 
         IO.println("\nSubject type:");
@@ -98,9 +97,7 @@ public class Main {
         IO.println("2. Elective (Music, Art, Physical Education)");
         int subjectTypeChoice = readInt("Select type: ", 1, 2);
 
-        SubjectType subjectType = subjectTypeChoice == 1
-                ? SubjectType.CORE
-                : SubjectType.ELECTIVE;
+        SubjectType subjectType = subjectTypeChoice == 1 ? SubjectType.CORE : SubjectType.ELECTIVE;
 
         String[] subjects = subjectType == SubjectType.CORE
                 ? new String[]{"Mathematics", "English", "Science"}
@@ -118,8 +115,7 @@ public class Main {
         IO.println("\nGrade confirmation");
         IO.println("Grade ID: " + grade.id());
         IO.println("Student: " + student.getName());
-        IO.println("Subject: %s (%s)".formatted(
-                grade.subject(), grade.subjectType().name().toLowerCase()));
+        IO.println("Subject: %s (%s)".formatted(grade.subject(), grade.subjectType().name().toLowerCase()));
         IO.println("Grade: %.2f%%".formatted(grade.value()));
 
         String confirmation = readRequired("Save grade? (Y/N): ");
@@ -139,8 +135,7 @@ public class Main {
             return;
         }
 
-        IO.println("\nStudent: %s - %s".formatted(
-                student.getStudentId(), student.getName()));
+        IO.println("\nStudent: %s - %s".formatted(student.getStudentId(), student.getName()));
         IO.println("Type: " + student.getStudentType());
         IO.println("Passing grade: %.0f%%".formatted(student.getPassingGrade()));
         IO.println("Average: %.2f%%".formatted(student.calculateAverageGrade()));
