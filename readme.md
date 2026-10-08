@@ -42,6 +42,22 @@ flowchart LR
         subjects((Select Core or Elective subject))
     end
 
+    subgraph classes[Implemented Java classes and types]
+        main[Main]
+        menu[Menu]
+        student[Student]
+        regular[RegularStudent]
+        honors[HonorsStudent]
+        subject[Subject]
+        core[CoreSubject]
+        elective[ElectiveSubject]
+        grade[Grade]
+        studentManager[StudentManager]
+        gradeManager[GradeManager]
+        gradable[Gradable]
+        viewHelper[StudentView]
+    end
+
     teacher --> add
     teacher --> view
     teacher --> record
@@ -54,6 +70,21 @@ flowchart LR
     record -. includes .-> ids
     view -. includes .-> average
     report -. includes .-> average
+
+    menu -. starts .-> main
+    main -. coordinates .-> add
+    main -. coordinates .-> view
+    main -. coordinates .-> record
+    main -. coordinates .-> report
+    student -. specialized by .-> regular
+    student -. specialized by .-> honors
+    subject -. specialized by .-> core
+    subject -. specialized by .-> elective
+    studentManager -. manages .-> student
+    gradeManager -. manages .-> grade
+    gradeManager -. implements .-> gradable
+    grade -. references .-> subject
+    viewHelper -. displays .-> student
 ```
 
 A standalone copy of the diagram is available in
@@ -144,3 +175,8 @@ Music, Art, and Physical Education. A grade is valid only when it is between
 - `StudentManager` and `GradeManager` use arrays and counters to meet the lab
   storage requirement.
 - `Main` coordinates the console use cases, while `Menu` handles navigation.
+
+The use-case diagram also identifies every implemented type: `Main`, `Menu`,
+`Student`, `RegularStudent`, `HonorsStudent`, `Subject`, `CoreSubject`,
+`ElectiveSubject`, `Grade`, `StudentManager`, `GradeManager`, `Gradable`, and
+`StudentView`.
