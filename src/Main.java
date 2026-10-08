@@ -1,3 +1,7 @@
+import manager.GradeManager;
+import manager.StudentManager;
+import model.*;
+
 public class Main {
 
     private static final StudentManager studentManager = new StudentManager();
@@ -14,8 +18,13 @@ public class Main {
                 case 2 -> viewStudents();
                 case 3 -> recordGrade();
                 case 4 -> viewGradeReport();
-                case 5 -> {
-                    IO.println("\nThank you for using Student Grade Management System!");
+                case 5 -> exportGradeReport();
+                case 6 -> calculateStudentGPA();
+                case 7 -> bulkImportGrades();
+                case 8 -> viewClassStatistics();
+                case 9 -> searchStudents();
+                case 10 -> {
+                    IO.println("\nThank you for using model.Student model.Grade Management System!");
                     IO.println("Goodbye!");
                     return false;
                 }
@@ -35,7 +44,7 @@ public class Main {
         String email = readRequired("Email: ");
         String phone = readRequired("Phone: ");
 
-        IO.println("\nStudent type:");
+        IO.println("\nmodel.Student type:");
         IO.println("1. Regular student (passing grade: 50%)");
         IO.println("2. Honors student (passing grade: 60%)");
         int type = readInt("Select type: ", 1, 2);
@@ -46,7 +55,7 @@ public class Main {
 
         studentManager.addStudent(student);
 
-        IO.println("\nStudent added successfully!");
+        IO.println("\nmodel.Student added successfully!");
         printStudentSummary(student);
     }
 
@@ -88,29 +97,29 @@ public class Main {
             return;
         }
 
-        IO.println("\nStudent: %s - %s".formatted(student.getStudentId(), student.getName()));
+        IO.println("\nmodel.Student: %s - %s".formatted(student.getStudentId(), student.getName()));
         IO.println("Current average: %.2f%%".formatted(student.calculateAverageGrade()));
 
         int subjectTypeChoice = readInt(
-                "\nSubject type (1. Core, 2. Elective): ", 1, 2);
+                "\nmodel.Subject type (1. Core, 2. Elective): ", 1, 2);
         Subject subject = chooseSubject(subjectTypeChoice);
-        double value = readDouble("Grade (0-100): ", 0, 100);
+        double value = readDouble("model.Grade (0-100): ", 0, 100);
         Grade grade = new Grade(student.getStudentId(), subject, value);
 
-        IO.println("\nGrade confirmation");
-        IO.println("Grade ID: " + grade.getGradeId());
-        IO.println("Student: " + student.getName());
-        IO.println("Subject: %s (%s)".formatted(
+        IO.println("\nmodel.Grade confirmation");
+        IO.println("model.Grade ID: " + grade.getGradeId());
+        IO.println("model.Student: " + student.getName());
+        IO.println("model.Subject: %s (%s)".formatted(
                 subject.getSubjectName(), subject.getSubjectType().toLowerCase()));
-        IO.println("Grade: %.2f%%".formatted(grade.getValue()));
+        IO.println("model.Grade: %.2f%%".formatted(grade.getValue()));
 
         String confirmation = readRequired("Save grade? (Y/N): ");
         if (confirmation.equalsIgnoreCase("Y")) {
             gradeManager.addGrade(grade);
             student.addGrade(grade);
-            IO.println("Grade recorded successfully!");
+            IO.println("model.Grade recorded successfully!");
         } else {
-            IO.println("Grade discarded.");
+            IO.println("model.Grade discarded.");
         }
     }
 
@@ -146,7 +155,7 @@ public class Main {
             return;
         }
 
-        IO.println("\nStudent: %s - %s".formatted(student.getStudentId(), student.getName()));
+        IO.println("\nmodel.Student: %s - %s".formatted(student.getStudentId(), student.getName()));
         IO.println("Type: " + student.getStudentType());
         IO.println("Passing grade: %.0f%%".formatted(student.getPassingGrade()));
         IO.println("Average: %.2f%%".formatted(student.calculateAverageGrade()));
@@ -173,7 +182,7 @@ public class Main {
             return null;
         }
 
-        String id = readRequired("Student ID: ").toUpperCase();
+        String id = readRequired("model.Student ID: ").toUpperCase();
         Student student = studentManager.findStudent(id);
         if (student == null) {
             IO.println("No student found with ID " + id + ".");
@@ -182,7 +191,7 @@ public class Main {
     }
 
     private static void printStudentSummary(Student student) {
-        IO.println("Student ID: " + student.getStudentId());
+        IO.println("model.Student ID: " + student.getStudentId());
         IO.println("Name: " + student.getName());
         IO.println("Type: " + student.getStudentType());
         IO.println("Age: " + student.getAge());

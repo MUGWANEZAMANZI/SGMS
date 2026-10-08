@@ -1,17 +1,23 @@
-public class RegularStudent extends Student {
+package model;
 
-    public RegularStudent(String name, int age, String email, String phone) {
+public class HonorsStudent extends Student {
+
+    public HonorsStudent(String name, int age, String email, String phone) {
         super(name, age, email, phone);
+    }
+
+    public boolean checkHonorsEligibility() {
+        return calculateAverageGrade() >= 85.0;
     }
 
     @Override
     public String getStudentType() {
-        return "Regular";
+        return "Honors";
     }
 
     @Override
     public double getPassingGrade() {
-        return 50.0;
+        return 60.0;
     }
 
     @Override
