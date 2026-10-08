@@ -13,4 +13,9 @@ public class RegularStudent extends Student {
     public double getPassingGrade() {
         return 50.0;
     }
+
+    @Override
+    public void displayStudentDetails() {
+        IO.println("%s - %s".formatted(getStudentId(), getName()));
+    }
 }

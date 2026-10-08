@@ -1,9 +1,7 @@
-import java.util.LinkedHashMap;
-import java.util.Map;
-
 public class Main {
 
-    private static final Map<String, Student> students = new LinkedHashMap<>();
+    private static final StudentManager studentManager = new StudentManager();
+    private static final GradeManager gradeManager = new GradeManager();
 
     public static void main(String[] args) {
         new Menu().start();
@@ -23,7 +21,7 @@ public class Main {
                 }
                 default -> IO.println("Invalid option.");
             }
-        } catch (IllegalArgumentException exception) {
+        } catch (IllegalArgumentException | IllegalStateException exception) {
             IO.println("\nInput error: " + exception.getMessage());
         }
         return true;
@@ -46,16 +44,17 @@ public class Main {
                 ? new RegularStudent(name, age, email, phone)
                 : new HonorsStudent(name, age, email, phone);
 
-        students.put(student.getStudentId(), student);
+        studentManager.addStudent(student);
 
-        IO.println("\n✓ Student added successfully!");
+        IO.println("\nStudent added successfully!");
         printStudentSummary(student);
     }
 
     private static void viewStudents() {
         IO.println("\n=============== STUDENTS ===============");
 
-        if (students.isEmpty()) {
+        Student[] students = studentManager.getStudents();
+        if (students.length == 0) {
             IO.println("No students have been added yet.");
             return;
         }
@@ -65,7 +64,7 @@ public class Main {
         IO.println("--------------------------------------------------------");
 
         double classTotal = 0;
-        for (Student student : students.values()) {
+        for (Student student : students) {
             double average = student.calculateAverageGrade();
             classTotal += average;
             IO.println("%-8s %-20s %-10s %6.2f%%   %s".formatted(
@@ -77,8 +76,8 @@ public class Main {
         }
 
         IO.println("--------------------------------------------------------");
-        IO.println("Total students: " + students.size());
-        IO.println("Class average: %.2f%%".formatted(classTotal / students.size()));
+        IO.println("Total students: " + students.length);
+        IO.println("Class average: %.2f%%".formatted(classTotal / students.length));
     }
 
     private static void recordGrade() {
@@ -92,39 +91,51 @@ public class Main {
         IO.println("\nStudent: %s - %s".formatted(student.getStudentId(), student.getName()));
         IO.println("Current average: %.2f%%".formatted(student.calculateAverageGrade()));
 
-        IO.println("\nSubject type:");
-        IO.println("1. Core (Mathematics, English, Science)");
-        IO.println("2. Elective (Music, Art, Physical Education)");
-        int subjectTypeChoice = readInt("Select type: ", 1, 2);
-
-        SubjectType subjectType = subjectTypeChoice == 1 ? SubjectType.CORE : SubjectType.ELECTIVE;
-
-        String[] subjects = subjectType == SubjectType.CORE
-                ? new String[]{"Mathematics", "English", "Science"}
-                : new String[]{"Music", "Art", "Physical Education"};
-
-        IO.println("\nAvailable subjects:");
-        for (int index = 0; index < subjects.length; index++) {
-            IO.println("%d. %s".formatted(index + 1, subjects[index]));
-        }
-
-        int subjectChoice = readInt("Select subject: ", 1, subjects.length);
+        int subjectTypeChoice = readInt(
+                "\nSubject type (1. Core, 2. Elective): ", 1, 2);
+        Subject subject = chooseSubject(subjectTypeChoice);
         double value = readDouble("Grade (0-100): ", 0, 100);
-        Grade grade = new Grade(subjects[subjectChoice - 1], subjectType, value);
+        Grade grade = new Grade(student.getStudentId(), subject, value);
 
         IO.println("\nGrade confirmation");
-        IO.println("Grade ID: " + grade.id());
+        IO.println("Grade ID: " + grade.getGradeId());
         IO.println("Student: " + student.getName());
-        IO.println("Subject: %s (%s)".formatted(grade.subject(), grade.subjectType().name().toLowerCase()));
-        IO.println("Grade: %.2f%%".formatted(grade.value()));
+        IO.println("Subject: %s (%s)".formatted(
+                subject.getSubjectName(), subject.getSubjectType().toLowerCase()));
+        IO.println("Grade: %.2f%%".formatted(grade.getValue()));
 
         String confirmation = readRequired("Save grade? (Y/N): ");
         if (confirmation.equalsIgnoreCase("Y")) {
+            gradeManager.addGrade(grade);
             student.addGrade(grade);
-            IO.println("✓ Grade recorded successfully!");
+            IO.println("Grade recorded successfully!");
         } else {
             IO.println("Grade discarded.");
         }
+    }
+
+    private static Subject chooseSubject(int subjectTypeChoice) {
+        String[] names;
+        if (subjectTypeChoice == 1) {
+            names = new String[]{"Mathematics", "English", "Science"};
+        } else {
+            names = new String[]{"Music", "Art", "Physical Education"};
+        }
+
+        IO.println("\nAvailable subjects:");
+        for (int index = 0; index < names.length; index++) {
+            IO.println("%d. %s".formatted(index + 1, names[index]));
+        }
+
+        int subjectChoice = readInt("Select subject: ", 1, names.length);
+        String name = names[subjectChoice - 1];
+        String code = subjectTypeChoice == 1
+                ? "CORE%03d".formatted(subjectChoice)
+                : "ELEC%03d".formatted(subjectChoice);
+
+        return subjectTypeChoice == 1
+                ? new CoreSubject(name, code)
+                : new ElectiveSubject(name, code);
     }
 
     private static void viewGradeReport() {
@@ -141,7 +152,8 @@ public class Main {
         IO.println("Average: %.2f%%".formatted(student.calculateAverageGrade()));
         IO.println("Status: " + statusText(student));
 
-        if (student.getGrades().isEmpty()) {
+        Grade[] grades = gradeManager.getGradesByStudent(student.getStudentId());
+        if (grades.length == 0) {
             IO.println("\nNo grades recorded for this student.");
             return;
         }
@@ -150,24 +162,19 @@ public class Main {
         IO.println("%-8s %-22s %-10s %8s  %-12s".formatted(
                 "ID", "SUBJECT", "TYPE", "GRADE", "DATE"));
         IO.println("--------------------------------------------------------");
-        for (Grade grade : student.getGrades()) {
-            IO.println("%-8s %-22s %-10s %7.2f%%  %-12s".formatted(
-                    grade.id(),
-                    grade.subject(),
-                    grade.subjectType(),
-                    grade.value(),
-                    grade.formattedDate()));
+        for (Grade grade : grades) {
+            grade.displayGradeDetails();
         }
     }
 
     private static Student findStudent() {
-        if (students.isEmpty()) {
+        if (studentManager.getStudentCount() == 0) {
             IO.println("No students have been added yet.");
             return null;
         }
 
         String id = readRequired("Student ID: ").toUpperCase();
-        Student student = students.get(id);
+        Student student = studentManager.findStudent(id);
         if (student == null) {
             IO.println("No student found with ID " + id + ".");
         }
@@ -184,7 +191,7 @@ public class Main {
     }
 
     private static String statusText(Student student) {
-        if (student.getGrades().isEmpty()) {
+        if (student.getGrades().length == 0) {
             return "No grades";
         }
         return student.isPassing() ? "Passing" : "Failing";
@@ -198,7 +205,7 @@ public class Main {
                     return value;
                 }
             } catch (NumberFormatException ignored) {
-                // The prompt is repeated with a clear message below.
+                // Repeat the prompt with a clear message below.
             }
             IO.println("Enter a whole number from %d to %d.".formatted(minimum, maximum));
         }
@@ -212,7 +219,7 @@ public class Main {
                     return value;
                 }
             } catch (NumberFormatException ignored) {
-                // The prompt is repeated with a clear message below.
+                // Repeat the prompt with a clear message below.
             }
             IO.println("Enter a number from %.0f to %.0f.".formatted(minimum, maximum));
         }

@@ -1,42 +1,61 @@
-import java.time.LocalDateTime;
+import java.time.LocalDate;
+import java.util.Objects;
 
-public record Grade(
-        String id,
-        String subject,
-        SubjectType subjectType,
-        double value,
-        LocalDateTime recordedAt
-) {
+public class Grade {
+
     private static int nextGradeNumber = 1;
 
-    public Grade(String subject, SubjectType subjectType, double value) {
-        this(
-                "GRD%03d".formatted(nextGradeNumber++),
-                subject,
-                subjectType,
-                value,
-                LocalDateTime.now()
-        );
-    }
+    private final String gradeId;
+    private final String studentId;
+    private final Subject subject;
+    private final double value;
+    private final LocalDate recordedAt;
 
-    public Grade {
-        if (subject == null || subject.isBlank()) {
-            throw new IllegalArgumentException("Subject cannot be blank");
-        }
-        if (subjectType == null) {
-            throw new IllegalArgumentException("Subject type is required");
+    public Grade(String studentId, Subject subject, double value) {
+        if (studentId == null || studentId.isBlank()) {
+            throw new IllegalArgumentException("Student ID cannot be blank");
         }
         if (value < 0 || value > 100) {
             throw new IllegalArgumentException("Grade must be between 0 and 100");
         }
+
+        this.gradeId = "GRD%03d".formatted(nextGradeNumber++);
+        this.studentId = studentId;
+        this.subject = Objects.requireNonNull(subject, "Subject cannot be null");
+        this.value = value;
+        this.recordedAt = LocalDate.now();
+    }
+
+    public String getGradeId() {
+        return gradeId;
+    }
+
+    public String getStudentId() {
+        return studentId;
+    }
+
+    public Subject getSubject() {
+        return subject;
+    }
+
+    public double getValue() {
+        return value;
+    }
+
+    public LocalDate getRecordedAt() {
+        return recordedAt;
     }
 
     public String formattedDate() {
-        return recordedAt.toLocalDate().toString();
+        return recordedAt.toString();
     }
-}
 
-enum SubjectType {
-    CORE,
-    ELECTIVE
+    public void displayGradeDetails() {
+        IO.println("%-8s %-22s %-10s %7.2f%%  %-12s".formatted(
+                gradeId,
+                subject.getSubjectName(),
+                subject.getSubjectType(),
+                value,
+                formattedDate()));
+    }
 }

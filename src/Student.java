@@ -1,5 +1,3 @@
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 
 public abstract class Student {
@@ -7,7 +5,8 @@ public abstract class Student {
     private static int nextStudentNumber = 1;
 
     private final String studentId;
-    private final List<Grade> grades = new ArrayList<>();
+    private final Grade[] grades = new Grade[200];
+    private int gradeCount;
 
     private String name;
     private int age;
@@ -69,31 +68,36 @@ public abstract class Student {
     }
 
     public void addGrade(Grade grade) {
-        grades.add(Objects.requireNonNull(grade, "Grade cannot be null"));
+        if (gradeCount >= grades.length) {
+            throw new IllegalStateException("Grade capacity has been reached");
+        }
+        grades[gradeCount++] = Objects.requireNonNull(grade, "Grade cannot be null");
     }
 
-    public List<Grade> getGrades() {
-        return List.copyOf(grades);
+    public Grade[] getGrades() {
+        return java.util.Arrays.copyOf(grades, gradeCount);
     }
 
     public double calculateAverageGrade() {
-        if (grades.isEmpty()) {
+        if (gradeCount == 0) {
             return 0.0;
         }
         double total = 0.0;
-        for (Grade grade : grades) {
-            total += grade.value();
+        for (int index = 0; index < gradeCount; index++) {
+            total += grades[index].getValue();
         }
-        return total / grades.size();
+        return total / gradeCount;
     }
 
     public boolean isPassing() {
-        return !grades.isEmpty() && calculateAverageGrade() >= getPassingGrade();
+        return gradeCount > 0 && calculateAverageGrade() >= getPassingGrade();
     }
 
     public abstract String getStudentType();
 
     public abstract double getPassingGrade();
+
+    public abstract void displayStudentDetails();
 
     private static String requireNonBlank(String value, String fieldName) {
         if (value == null || value.isBlank()) {

@@ -1,9 +1,11 @@
 public class HonorsStudent extends Student {
 
-    public HonorsStudent(String name, int age, String email, String phone) {super(name, age, email, phone);}
+    public HonorsStudent(String name, int age, String email, String phone) {
+        super(name, age, email, phone);
+    }
 
     public boolean checkHonorsEligibility() {
-        return calculateAverageGrade() >= 80.0;
+        return calculateAverageGrade() >= 85.0;
     }
 
     @Override
@@ -14,5 +16,10 @@ public class HonorsStudent extends Student {
     @Override
     public double getPassingGrade() {
         return 60.0;
+    }
+
+    @Override
+    public void displayStudentDetails() {
+        IO.println("%s - %s".formatted(getStudentId(), getName()));
     }
 }

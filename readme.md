@@ -73,12 +73,18 @@ Java 25 is recommended because the application uses `IO.readln`,
 ```text
 SGMS/
 ├── src/
-│   ├── Main.java             # Application operations and in-memory storage
+│   ├── Main.java             # Application operations and input validation
 │   ├── Menu.java             # Console menu and navigation loop
-│   ├── Student.java          # Abstract student model and shared behavior
+│   ├── Student.java          # Abstract student model and grade array
 │   ├── RegularStudent.java   # 50% passing threshold
 │   ├── HonorsStudent.java    # 60% passing threshold and honors eligibility
-│   ├── Grade.java            # Grade record and validation
+│   ├── Subject.java          # Abstract subject model
+│   ├── CoreSubject.java      # Mandatory subject implementation
+│   ├── ElectiveSubject.java  # Optional subject implementation
+│   ├── Grade.java            # Grade model and validation
+│   ├── StudentManager.java   # Array-backed student storage
+│   ├── GradeManager.java     # Array-backed grade history
+│   ├── Gradable.java         # Grade validation contract
 │   └── StudentView.java      # Student display helper
 ├── docs/
 │   └── use-case-diagram.md   # Use-case diagram for the lab submission
@@ -132,8 +138,9 @@ Music, Art, and Physical Education. A grade is valid only when it is between
   calculations.
 - `RegularStudent` and `HonorsStudent` override the student type and passing
   threshold, demonstrating inheritance and polymorphism.
-- `Grade` is a record with validation for subject, subject type, and grade
-  range.
-- `Student` composes a list of `Grade` objects.
+- `Grade` is an immutable-style class with validation for student, subject, and
+  grade range.
+- `Student` composes a fixed-size array of `Grade` objects.
+- `StudentManager` and `GradeManager` use arrays and counters to meet the lab
+  storage requirement.
 - `Main` coordinates the console use cases, while `Menu` handles navigation.
-
