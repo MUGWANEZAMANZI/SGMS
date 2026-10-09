@@ -84,6 +84,7 @@ public abstract class Student {
         if (gradeCount == 0) {
             return 0.0;
         }
+
         double total = 0.0;
         for (int index = 0; index < gradeCount; index++) {
             total += grades[index].getValue();

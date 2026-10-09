@@ -1,6 +1,13 @@
 import manager.GradeManager;
 import manager.StudentManager;
 import model.*;
+import report.GradeReport;
+import report.GradeReportService;
+import report.TextGradeReportExporter;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 public class Main {
 
@@ -19,10 +26,10 @@ public class Main {
                 case 3 -> recordGrade();
                 case 4 -> viewGradeReport();
                 case 5 -> exportGradeReport();
-                case 6 -> calculateStudentGPA();
-                case 7 -> bulkImportGrades();
-                case 8 -> viewClassStatistics();
-                case 9 -> searchStudents();
+//                case 6 -> calculateStudentGPA();
+//                case 7 -> bulkImportGrades();
+//                case 8 -> viewClassStatistics();
+//                case 9 -> searchStudents();
                 case 10 -> {
                     IO.println("\nThank you for using model.Student model.Grade Management System!");
                     IO.println("Goodbye!");
@@ -150,25 +157,29 @@ public class Main {
     private static void viewGradeReport() {
         IO.println("\n============= GRADE REPORT =============");
 
-        Student student = findStudent();
-        if (student == null) {
-            return;
-        }
+        GradeReportService reportService = new GradeReportService(studentManager, gradeManager);
+        String studentId = readRequired("Enter the student ID to view the grade report: ");
+        GradeReport report = reportService.createReport(studentId);
+        Student student = report.student();
 
         IO.println("\nmodel.Student: %s - %s".formatted(student.getStudentId(), student.getName()));
         IO.println("Type: " + student.getStudentType());
         IO.println("Passing grade: %.0f%%".formatted(student.getPassingGrade()));
-        IO.println("Average: %.2f%%".formatted(student.calculateAverageGrade()));
-        IO.println("Status: " + statusText(student));
+        IO.println("Overall average: %.2f%%".formatted(report.overallAverage()));
+        IO.println("Core average: %.2f%%".formatted(report.coreAverage()));
+        IO.println("Elective average: %.2f%%".formatted(report.electiveAverage()));
 
-        Grade[] grades = gradeManager.getGradesByStudent(student.getStudentId());
+        //Ternary operator to determine the status of the student based on the grades and passing criteria
+        String status = report.grades().length == 0 ? "No grades" : report.passing() ? "Passing" : "Failing";
+        IO.println("Status: " + status);
+
+        Grade[] grades = report.grades();
         if (grades.length == 0) {
             IO.println("\nNo grades recorded for this student.");
             return;
         }
 
-        IO.println("\nGRADE HISTORY");
-        IO.println("%-8s %-22s %-10s %8s  %-12s".formatted(
+        IO.println("\n%-8s %-22s %-10s %-10s %-12s".formatted(
                 "ID", "SUBJECT", "TYPE", "GRADE", "DATE"));
         IO.println("--------------------------------------------------------");
         for (Grade grade : grades) {
@@ -206,6 +217,25 @@ public class Main {
         return student.isPassing() ? "Passing" : "Failing";
     }
 
+    private static void exportGradeReport() {
+        IO.println("\n========== EXPORT GRADE REPORT ==========");
+
+        String studentId = readRequired("Enter the student ID to export: ");
+        GradeReportService reportService = new GradeReportService(studentManager, gradeManager);
+        GradeReport report = reportService.createReport(studentId);
+
+        Path directory = Path.of("grade_reports");
+        Path file = directory.resolve(studentId.toUpperCase() + "_report.txt");
+        try {
+            Files.createDirectories(directory);
+            new TextGradeReportExporter().export(report, file);
+            IO.println("Report exported to " + file.toAbsolutePath());
+        } catch (IOException exception) {
+            throw new IllegalStateException("Could not export report: " + exception.getMessage(), exception);
+        }
+    }
+
+
     public static int readInt(String prompt, int minimum, int maximum) {
         while (true) {
             try {
@@ -228,7 +258,7 @@ public class Main {
                     return value;
                 }
             } catch (NumberFormatException ignored) {
-                // Repeat the prompt with a clear message below.
+                IO.println("The enter value is not valid. Please enter a valid number.");
             }
             IO.println("Enter a number from %.0f to %.0f.".formatted(minimum, maximum));
         }
