@@ -2,6 +2,7 @@ import contract.InputReader;
 import services.BulkImportService;
 import services.GradeService;
 import services.StudentApplicationService;
+import services.StudentSearchService;
 
 import java.io.IOException;
 import java.util.LinkedHashMap;
@@ -14,12 +15,18 @@ public class Menu {
     private final InputReader inputReader;
     private final BulkImportService bulkImportService;
     private final GradeService gradeService;
+    private final StudentSearchService studentSearchService;
 
-    public Menu(StudentApplicationService studentApplicationService, GradeService gradeService, InputReader inputReader) {
+    public Menu(
+            StudentApplicationService studentApplicationService,
+            GradeService gradeService,
+            StudentSearchService studentSearchService,
+            InputReader inputReader) {
         this.studentApplicationService = studentApplicationService;
         this.inputReader = inputReader;
         this.bulkImportService = new BulkImportService();
         this.gradeService = gradeService;
+        this.studentSearchService = studentSearchService;
         options.put(1, "Add model.Student");
         options.put(2, "View Students");
         options.put(3, "Record model.Grade");
@@ -73,7 +80,7 @@ public class Menu {
                 case 6 -> Main.calculateStudentGPA();
                 case 7 -> bulkImportService.importCSV("path/to/grades.csv");
                 case 8 -> IO.println("Class statistics are not implemented yet.");
-                case 9 -> IO.println("Search Students feature is not implemented yet.");
+                case 9 -> studentSearchService.search();
                 case 10 -> {
                     IO.println("\nThank you for using the Student Grade Management System!");
                     IO.println("Goodbye!");

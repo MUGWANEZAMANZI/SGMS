@@ -3,6 +3,7 @@ import controller.ConsoleInputReader;
 import controller.GPACalculator;
 import services.GradeService;
 import services.StudentApplicationService;
+import services.StudentSearchService;
 import manager.GradeManager;
 import manager.StudentManager;
 import model.*;
@@ -22,12 +23,18 @@ public class Main {
     private static final InputReader inputReader = new ConsoleInputReader();
     private static final GradeService gradeService =
             new GradeService(studentManager, gradeManager, inputReader);
+    private static final StudentSearchService studentSearchService =
+            new StudentSearchService(studentManager, inputReader);
     private static final GPACalculator gpaCalculator = new GPACalculator();
 
     public static void main(String[] args) {
         StudentApplicationService  studentApplicationService =
                 new StudentApplicationService(studentManager, inputReader);
-        new Menu(studentApplicationService, gradeService, inputReader).start();
+        new Menu(
+                studentApplicationService,
+                gradeService,
+                studentSearchService,
+                inputReader).start();
 
     }
 
