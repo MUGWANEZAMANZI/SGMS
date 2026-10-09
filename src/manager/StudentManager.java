@@ -1,16 +1,20 @@
+package manager;
+
+import model.Student;
+
 import java.util.Arrays;
 
 public class StudentManager {
 
-    private final Student[] students = new Student[50];
+    private final Student[] students = new Student[50]; //In case use ArrayList to store dynamic number of students.
     private int studentCount;
 
     public void addStudent(Student student) {
         if (studentCount >= students.length) {
-            throw new IllegalStateException("Student capacity has been reached");
+            throw new IllegalStateException("model.Student capacity has been reached");
         }
         students[studentCount++] = java.util.Objects.requireNonNull(
-                student, "Student cannot be null");
+                student, "model.Student cannot be null");
     }
 
     public Student findStudent(String studentId) {

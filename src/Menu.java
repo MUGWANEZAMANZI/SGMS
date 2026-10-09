@@ -6,11 +6,16 @@ public class Menu {
     private final Map<Integer, String> options = new LinkedHashMap<>();
 
     public Menu() {
-        options.put(1, "Add Student");
+        options.put(1, "Add model.Student");
         options.put(2, "View Students");
-        options.put(3, "Record Grade");
-        options.put(4, "View Grade Report");
-        options.put(5, "Exit");
+        options.put(3, "Record model.Grade");
+        options.put(4, "View model.Grade Report");
+        options.put(5, "Export model.Grade Report");
+        options.put(6, "Calculate model.Student GPA");
+        options.put(7, "Bulk Import Grades");
+        options.put(8, "View Class Statistics");
+        options.put(9, "Search Students");
+        options.put(10, "Exit");
     }
 
     public void start() {

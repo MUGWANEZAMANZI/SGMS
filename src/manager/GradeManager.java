@@ -1,3 +1,10 @@
+package manager;
+
+import contract.Gradable;
+import model.Grade;
+import model.Student;
+import model.Subject;
+
 import java.util.Arrays;
 import java.util.Objects;
 
@@ -8,14 +15,14 @@ public class GradeManager implements Gradable {
 
     public void addGrade(Grade grade) {
         if (gradeCount >= grades.length) {
-            throw new IllegalStateException("Grade capacity has been reached");
+            throw new IllegalStateException("model.Grade capacity has been reached");
         }
-        grades[gradeCount++] = Objects.requireNonNull(grade, "Grade cannot be null");
+        grades[gradeCount++] = Objects.requireNonNull(grade, "model.Grade cannot be null");
     }
 
     public void recordGrade(Student student, Subject subject, double value) {
         if (!validateGrade(value)) {
-            throw new IllegalArgumentException("Grade must be between 0 and 100");
+            throw new IllegalArgumentException("model.Grade must be between 0 and 100");
         }
         Grade grade = new Grade(student.getStudentId(), subject, value);
         student.addGrade(grade);

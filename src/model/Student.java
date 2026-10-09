@@ -1,3 +1,5 @@
+package model;
+
 import java.util.Objects;
 
 public abstract class Student {
@@ -69,9 +71,9 @@ public abstract class Student {
 
     public void addGrade(Grade grade) {
         if (gradeCount >= grades.length) {
-            throw new IllegalStateException("Grade capacity has been reached");
+            throw new IllegalStateException("model.Grade capacity has been reached");
         }
-        grades[gradeCount++] = Objects.requireNonNull(grade, "Grade cannot be null");
+        grades[gradeCount++] = Objects.requireNonNull(grade, "model.Grade cannot be null");
     }
 
     public Grade[] getGrades() {
@@ -82,6 +84,7 @@ public abstract class Student {
         if (gradeCount == 0) {
             return 0.0;
         }
+
         double total = 0.0;
         for (int index = 0; index < gradeCount; index++) {
             total += grades[index].getValue();

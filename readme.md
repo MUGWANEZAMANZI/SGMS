@@ -1,4 +1,4 @@
-# Student Grade Management System
+# model.Student model.Grade Management System
 
 A Java console application for registering students and recording and reviewing
 their academic grades. The project demonstrates encapsulation, inheritance,
@@ -28,10 +28,16 @@ the primary actor who uses the console menu; the student types and subject
 types are domain concepts used by the system rather than separate users.
 
 ```mermaid
+---
+config:
+    look: handDrawn
+    layout: classic
+    theme: base
+---
 flowchart LR
     teacher[Teacher / Academic Administrator]
 
-    subgraph system[Student Grade Management System]
+    subgraph system[model.Student model.Grade Management System]
         add((Add student))
         view((View all students))
         record((Record grade))
@@ -45,16 +51,16 @@ flowchart LR
     subgraph classes[Implemented Java classes and types]
         main[Main]
         menu[Menu]
-        student[Student]
-        regular[RegularStudent]
-        honors[HonorsStudent]
-        subject[Subject]
-        core[CoreSubject]
-        elective[ElectiveSubject]
-        grade[Grade]
-        studentManager[StudentManager]
-        gradeManager[GradeManager]
-        gradable[Gradable]
+        student[model.Student]
+        regular[model.RegularStudent]
+        honors[model.HonorsStudent]
+        subject[model.Subject]
+        core[model.CoreSubject]
+        elective[model.ElectiveSubject]
+        grade[model.Grade]
+        studentManager[manager.StudentManager]
+        gradeManager[manager.GradeManager]
+        gradable[contract.Gradable]
         viewHelper[StudentView]
     end
 
@@ -106,20 +112,20 @@ SGMS/
 ├── src/
 │   ├── Main.java             # Application operations and input validation
 │   ├── Menu.java             # Console menu and navigation loop
-│   ├── Student.java          # Abstract student model and grade array
-│   ├── RegularStudent.java   # 50% passing threshold
-│   ├── HonorsStudent.java    # 60% passing threshold and honors eligibility
-│   ├── Subject.java          # Abstract subject model
-│   ├── CoreSubject.java      # Mandatory subject implementation
-│   ├── ElectiveSubject.java  # Optional subject implementation
-│   ├── Grade.java            # Grade model and validation
-│   ├── StudentManager.java   # Array-backed student storage
-│   ├── GradeManager.java     # Array-backed grade history
-│   ├── Gradable.java         # Grade validation contract
-│   └── StudentView.java      # Student display helper
+│   ├── model.Student.java          # Abstract student model and grade array
+│   ├── model.RegularStudent.java   # 50% passing threshold
+│   ├── model.HonorsStudent.java    # 60% passing threshold and honors eligibility
+│   ├── model.Subject.java          # Abstract subject model
+│   ├── model.CoreSubject.java      # Mandatory subject implementation
+│   ├── model.ElectiveSubject.java  # Optional subject implementation
+│   ├── model.Grade.java            # model.Grade model and validation
+│   ├── manager.StudentManager.java   # Array-backed student storage
+│   ├── manager.GradeManager.java     # Array-backed grade history
+│   ├── contract.Gradable.java         # model.Grade validation contract
+│   └── StudentView.java      # model.Student display helper
 ├── docs/
 │   └── use-case-diagram.md   # Use-case diagram for the lab submission
-└── Student-Grade-Mgt-I.md    # Original lab brief and user stories
+└── model.Student-model.Grade-Mgt-I.md    # Original lab brief and user stories
 ```
 
 ## Running the application
@@ -154,7 +160,7 @@ On macOS or Linux, use `src/*.java` instead of `src\*.java`.
 
 ## Grading rules
 
-| Student type | Passing grade |
+| model.Student type | Passing grade |
 | --- | ---: |
 | Regular | 50% |
 | Honors | 60% |
