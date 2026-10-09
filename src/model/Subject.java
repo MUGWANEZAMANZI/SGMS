@@ -1,9 +1,12 @@
 package model;
 
+
 public abstract class Subject {
 
     private final String subjectName;
     private final String subjectCode;
+    private final String gpa;
+
 
     protected Subject(String subjectName, String subjectCode) {
         if (subjectName == null || subjectName.isBlank()) {
@@ -14,6 +17,11 @@ public abstract class Subject {
         }
         this.subjectName = subjectName.trim();
         this.subjectCode = subjectCode.trim();
+
+
+    }
+    public String getGpa() {
+
     }
 
     public String getSubjectName() {

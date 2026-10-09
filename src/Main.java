@@ -26,7 +26,7 @@ public class Main {
                 case 3 -> recordGrade();
                 case 4 -> viewGradeReport();
                 case 5 -> exportGradeReport();
-//                case 6 -> calculateStudentGPA();
+                case 6 -> calculateStudentGPA();
 //                case 7 -> bulkImportGrades();
 //                case 8 -> viewClassStatistics();
 //                case 9 -> searchStudents();
@@ -128,6 +128,22 @@ public class Main {
         } else {
             IO.println("model.Grade discarded.");
         }
+    }
+
+    private static void calculateStudentGPA() {
+        IO.println("\n============= CALCULATE GPA =============");
+        String studentId = readRequired("Enter the student ID to calculate GPA: ");
+
+
+        Student student = findStudent();
+        if (student == null) {
+            return;
+        }
+
+        double average = student.calculateAverageGrade();
+        IO.println("\nmodel.Student: %s - %s".formatted(student.getStudentId(), student.getName()));
+        IO.println("Current average: %.2f%%".formatted(average));
+        IO.println("Status: " + statusText(student));
     }
 
     private static Subject chooseSubject(int subjectTypeChoice) {
