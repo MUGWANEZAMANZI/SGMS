@@ -40,8 +40,6 @@ public class Grade {
         return subject;
     }
 
-    public String get
-
     public double getValue() {
         return value;
     }

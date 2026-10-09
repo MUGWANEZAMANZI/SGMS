@@ -1,3 +1,10 @@
+import contract.InputReader;
+import controller.ConsoleInputReader;
+import controller.GPACalculator;
+import services.GradeService;
+import services.BulkImportService;
+import services.StudentApplicationService;
+import services.StudentSearchService;
 import manager.GradeManager;
 import manager.StudentManager;
 import model.*;
@@ -9,172 +16,74 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+
 public class Main {
 
     private static final StudentManager studentManager = new StudentManager();
     private static final GradeManager gradeManager = new GradeManager();
+    private static final InputReader inputReader = new ConsoleInputReader();
+    private static final GradeService gradeService =
+            new GradeService(studentManager, gradeManager, inputReader);
+    private static final StudentSearchService studentSearchService =
+            new StudentSearchService(studentManager, inputReader);
+    private static final GPACalculator gpaCalculator = new GPACalculator();
 
     public static void main(String[] args) {
-        new Menu().start();
+        StudentApplicationService  studentApplicationService =
+                new StudentApplicationService(studentManager, inputReader);
+        new Menu(
+                studentApplicationService,
+                gradeService,
+                studentSearchService,
+                new BulkImportService(studentManager, gradeManager),
+                inputReader).start();
+
     }
 
-    public static boolean operations(int option) {
-        try {
-            switch (option) {
-                case 1 -> addStudent();
-                case 2 -> viewStudents();
-                case 3 -> recordGrade();
-                case 4 -> viewGradeReport();
-                case 5 -> exportGradeReport();
-                case 6 -> calculateStudentGPA();
-//                case 7 -> bulkImportGrades();
-//                case 8 -> viewClassStatistics();
-//                case 9 -> searchStudents();
-                case 10 -> {
-                    IO.println("\nThank you for using model.Student model.Grade Management System!");
-                    IO.println("Goodbye!");
-                    return false;
-                }
-                default -> IO.println("Invalid option.");
-            }
-        } catch (IllegalArgumentException | IllegalStateException exception) {
-            IO.println("\nInput error: " + exception.getMessage());
-        }
-        return true;
-    }
 
-    private static void addStudent() {
-        IO.println("\n============= ADD STUDENT =============");
 
-        String name = readRequired("Name: ");
-        int age = readInt("Age: ", 1, 120);
-        String email = readRequired("Email: ");
-        String phone = readRequired("Phone: ");
-
-        IO.println("\nmodel.Student type:");
-        IO.println("1. Regular student (passing grade: 50%)");
-        IO.println("2. Honors student (passing grade: 60%)");
-        int type = readInt("Select type: ", 1, 2);
-
-        Student student = type == 1
-                ? new RegularStudent(name, age, email, phone)
-                : new HonorsStudent(name, age, email, phone);
-
-        studentManager.addStudent(student);
-
-        IO.println("\nmodel.Student added successfully!");
-        printStudentSummary(student);
-    }
-
-    private static void viewStudents() {
-        IO.println("\n=============== STUDENTS ===============");
-
-        Student[] students = studentManager.getStudents();
-        if (students.length == 0) {
-            IO.println("No students have been added yet.");
-            return;
-        }
-
-        IO.println("%-8s %-20s %-10s %-10s %-10s".formatted(
-                "ID", "NAME", "TYPE", "AVERAGE", "STATUS"));
-        IO.println("--------------------------------------------------------");
-
-        double classTotal = 0;
-        for (Student student : students) {
-            double average = student.calculateAverageGrade();
-            classTotal += average;
-            IO.println("%-8s %-20s %-10s %6.2f%%   %s".formatted(
-                    student.getStudentId(),
-                    student.getName(),
-                    student.getStudentType(),
-                    average,
-                    statusText(student)));
-        }
-
-        IO.println("--------------------------------------------------------");
-        IO.println("Total students: " + students.length);
-        IO.println("Class average: %.2f%%".formatted(classTotal / students.length));
-    }
-
-    private static void recordGrade() {
-        IO.println("\n============= RECORD GRADE =============");
-
-        Student student = findStudent();
-        if (student == null) {
-            return;
-        }
-
-        IO.println("\nmodel.Student: %s - %s".formatted(student.getStudentId(), student.getName()));
-        IO.println("Current average: %.2f%%".formatted(student.calculateAverageGrade()));
-
-        int subjectTypeChoice = readInt(
-                "\nmodel.Subject type (1. Core, 2. Elective): ", 1, 2);
-        Subject subject = chooseSubject(subjectTypeChoice);
-        double value = readDouble("model.Grade (0-100): ", 0, 100);
-        Grade grade = new Grade(student.getStudentId(), subject, value);
-
-        IO.println("\nmodel.Grade confirmation");
-        IO.println("model.Grade ID: " + grade.getGradeId());
-        IO.println("model.Student: " + student.getName());
-        IO.println("model.Subject: %s (%s)".formatted(
-                subject.getSubjectName(), subject.getSubjectType().toLowerCase()));
-        IO.println("model.Grade: %.2f%%".formatted(grade.getValue()));
-
-        String confirmation = readRequired("Save grade? (Y/N): ");
-        if (confirmation.equalsIgnoreCase("Y")) {
-            gradeManager.addGrade(grade);
-            student.addGrade(grade);
-            IO.println("model.Grade recorded successfully!");
-        } else {
-            IO.println("model.Grade discarded.");
-        }
-    }
-
-    private static void calculateStudentGPA() {
+    static void calculateStudentGPA() {
         IO.println("\n============= CALCULATE GPA =============");
-        String studentId = readRequired("Enter the student ID to calculate GPA: ");
-
-
-        Student student = findStudent();
+        String studentId = inputReader.readRequired(
+                "Enter the student ID to calculate GPA: ").toUpperCase();
+        Student student = studentManager.findStudentById(studentId);
         if (student == null) {
+            IO.println("No student found with ID " + studentId + ".");
             return;
         }
 
+        Grade[] grades = gradeManager.getGradesByStudent(student.getStudentId());
         double average = student.calculateAverageGrade();
+        double cumulativeGpa = gpaCalculator.calculateCumulativeGPA(grades);
+
         IO.println("\nmodel.Student: %s - %s".formatted(student.getStudentId(), student.getName()));
-        IO.println("Current average: %.2f%%".formatted(average));
+        IO.println("Overall average: %.2f%%".formatted(average));
+        IO.println("\n%-22s %-12s %-8s %-8s".formatted(
+                "SUBJECT", "PERCENTAGE", "GPA", "LETTER"));
+        IO.println("--------------------------------------------------------");
+        for (Grade grade : grades) {
+            GradePoint result = gpaCalculator.convertPercentageToGPA(
+                    grade.getValue());
+            IO.println("%-22s %9.2f%% %8.1f %-8s".formatted(
+                    grade.getSubject().getSubjectName(),
+                    result.percentage(),
+                    result.gpa(),
+                    result.letterGrade()));
+        }
+        IO.println("--------------------------------------------------------");
+        IO.println("Cumulative GPA: %.2f / 4.00".formatted(cumulativeGpa));
+        IO.println("Class rank: %d of %d".formatted(
+                calculateClassRank(cumulativeGpa), studentManager.getStudentCount()));
         IO.println("Status: " + statusText(student));
     }
 
-    private static Subject chooseSubject(int subjectTypeChoice) {
-        String[] names;
-        if (subjectTypeChoice == 1) {
-            names = new String[]{"Mathematics", "English", "Science"};
-        } else {
-            names = new String[]{"Music", "Art", "Physical Education"};
-        }
 
-        IO.println("\nAvailable subjects:");
-        for (int index = 0; index < names.length; index++) {
-            IO.println("%d. %s".formatted(index + 1, names[index]));
-        }
-
-        int subjectChoice = readInt("Select subject: ", 1, names.length);
-        String name = names[subjectChoice - 1];
-        String code = subjectTypeChoice == 1
-                ? "CORE%03d".formatted(subjectChoice)
-                : "ELEC%03d".formatted(subjectChoice);
-
-        return subjectTypeChoice == 1
-                ? new CoreSubject(name, code)
-                : new ElectiveSubject(name, code);
-    }
-
-    private static void viewGradeReport() {
+    static void viewGradeReport() {
         IO.println("\n============= GRADE REPORT =============");
 
         GradeReportService reportService = new GradeReportService(studentManager, gradeManager);
-        String studentId = readRequired("Enter the student ID to view the grade report: ");
+        String studentId = inputReader.readRequired(
+                "Enter the student ID to view the grade report: ");
         GradeReport report = reportService.createReport(studentId);
         Student student = report.student();
 
@@ -209,8 +118,8 @@ public class Main {
             return null;
         }
 
-        String id = readRequired("model.Student ID: ").toUpperCase();
-        Student student = studentManager.findStudent(id);
+        String id = inputReader.readRequired("model.Student ID: ").toUpperCase();
+        Student student = studentManager.findStudentById(id);
         if (student == null) {
             IO.println("No student found with ID " + id + ".");
         }
@@ -226,17 +135,13 @@ public class Main {
         IO.println("Status: " + student.getStatus());
     }
 
-    private static String statusText(Student student) {
-        if (student.getGrades().length == 0) {
-            return "No grades";
-        }
-        return student.isPassing() ? "Passing" : "Failing";
-    }
 
-    private static void exportGradeReport() {
+
+    static void exportGradeReport() {
         IO.println("\n========== EXPORT GRADE REPORT ==========");
 
-        String studentId = readRequired("Enter the student ID to export: ");
+        String studentId = inputReader.readRequired(
+                "Enter the student ID to export: ");
         GradeReportService reportService = new GradeReportService(studentManager, gradeManager);
         GradeReport report = reportService.createReport(studentId);
 
@@ -252,45 +157,28 @@ public class Main {
     }
 
 
-    public static int readInt(String prompt, int minimum, int maximum) {
-        while (true) {
-            try {
-                int value = Integer.parseInt(readRequired(prompt));
-                if (value >= minimum && value <= maximum) {
-                    return value;
-                }
-            } catch (NumberFormatException ignored) {
-                // Repeat the prompt with a clear message below.
-            }
-            IO.println("Enter a whole number from %d to %d.".formatted(minimum, maximum));
-        }
-    }
 
-    private static double readDouble(String prompt, double minimum, double maximum) {
-        while (true) {
-            try {
-                double value = Double.parseDouble(readRequired(prompt));
-                if (value >= minimum && value <= maximum) {
-                    return value;
-                }
-            } catch (NumberFormatException ignored) {
-                IO.println("The enter value is not valid. Please enter a valid number.");
-            }
-            IO.println("Enter a number from %.0f to %.0f.".formatted(minimum, maximum));
-        }
-    }
-
-    private static String readRequired(String prompt) {
-        while (true) {
-            String value = IO.readln(prompt);
-            if (value != null && !value.isBlank()) {
-                return value.trim();
-            }
-            IO.println("This value is required.");
-        }
-    }
 
     public static void pause() {
-        IO.readln("\nPress Enter to continue...");
+        inputReader.pause();
+    }
+
+    private static String statusText(Student student) {
+        if (student.getGrades().length == 0) {
+            return "No grades";
+        }
+        return student.isPassing() ? "Passing" : "Failing";
+    }
+
+    private static int calculateClassRank(double studentGpa) {
+        int rank = 1;
+        for (Student student : studentManager.getStudents()) {
+            double classGpa = gpaCalculator.calculateCumulativeGPA(
+                    gradeManager.getGradesByStudent(student.getStudentId()));
+            if (classGpa > studentGpa) {
+                rank++;
+            }
+        }
+        return rank;
     }
 }

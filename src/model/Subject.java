@@ -5,8 +5,6 @@ public abstract class Subject {
 
     private final String subjectName;
     private final String subjectCode;
-    private final String gpa;
-
 
     protected Subject(String subjectName, String subjectCode) {
         if (subjectName == null || subjectName.isBlank()) {
@@ -20,10 +18,6 @@ public abstract class Subject {
 
 
     }
-    public String getGpa() {
-
-    }
-
     public String getSubjectName() {
         return subjectName;
     }

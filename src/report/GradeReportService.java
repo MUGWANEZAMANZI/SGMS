@@ -23,7 +23,7 @@ public class GradeReportService {
             throw new IllegalArgumentException("Student ID cannot be blank");
         }
 
-        Student student = studentManager.findStudent(studentId);
+        Student student = studentManager.findStudentById(studentId);
         if (student == null) {
             throw new IllegalArgumentException("Student not found: " + studentId);
         }
