@@ -1,6 +1,9 @@
-import controller.ConsoleInputReader;
-import controller.StudentApplicationService;
+import contract.InputReader;
+import services.BulkImportService;
+import services.GradeService;
+import services.StudentApplicationService;
 
+import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -8,9 +11,15 @@ public class Menu {
 
     private final Map<Integer, String> options = new LinkedHashMap<>();
     private final StudentApplicationService studentApplicationService;
+    private final InputReader inputReader;
+    private final BulkImportService bulkImportService;
+    private final GradeService gradeService;
 
-    public Menu(StudentApplicationService studentApplicationService) {
+    public Menu(StudentApplicationService studentApplicationService, GradeService gradeService, InputReader inputReader) {
         this.studentApplicationService = studentApplicationService;
+        this.inputReader = inputReader;
+        this.bulkImportService = new BulkImportService();
+        this.gradeService = gradeService;
         options.put(1, "Add model.Student");
         options.put(2, "View Students");
         options.put(3, "Record model.Grade");
@@ -29,7 +38,7 @@ public class Menu {
         boolean running = true;
         while (running) {
             showOptions();
-            int option = ConsoleInputReader.readInt("Choose an option: ", 1, 10);
+            int option = inputReader.readInt("Choose an option: ", 1, 10);
             running = handleOptions(option);
 
             if (running) {
@@ -57,14 +66,14 @@ public class Menu {
         try {
             switch (option) {
                 case 1 -> studentApplicationService.addStudent();
-                case 2 -> Main.viewStudents();
-                case 3 -> Main.recordGrade();
+                case 2 -> studentApplicationService.viewStudents();
+                case 3 -> gradeService.recordGrade();
                 case 4 -> Main.viewGradeReport();
                 case 5 -> Main.exportGradeReport();
                 case 6 -> Main.calculateStudentGPA();
-                case 7 -> IO.println("Bulk import is not implemented yet.");
+                case 7 -> bulkImportService.importCSV("path/to/grades.csv");
                 case 8 -> IO.println("Class statistics are not implemented yet.");
-                case 9 -> IO.println("Student search is not implemented yet.");
+                case 9 -> IO.println("Search Students feature is not implemented yet.");
                 case 10 -> {
                     IO.println("\nThank you for using the Student Grade Management System!");
                     IO.println("Goodbye!");
@@ -74,6 +83,8 @@ public class Menu {
             }
         } catch (IllegalArgumentException | IllegalStateException exception) {
             IO.println("\nInput error: " + exception.getMessage());
+        } catch (IOException e) {
+            IO.println("\nCould not import CSV file:: " + e.getMessage());
         }
 
         return true;

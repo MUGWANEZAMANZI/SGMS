@@ -1,6 +1,7 @@
 import contract.InputReader;
 import controller.ConsoleInputReader;
-import controller.StudentApplicationService;
+import services.GradeService;
+import services.StudentApplicationService;
 import manager.GradeManager;
 import manager.StudentManager;
 import model.*;
@@ -17,81 +18,17 @@ public class Main {
 
     private static final StudentManager studentManager = new StudentManager();
     private static final GradeManager gradeManager = new GradeManager();
-
+    private static final GradeService gradeService;
 
     public static void main(String[] args) {
         InputReader inputReader = new ConsoleInputReader();
         StudentApplicationService  studentApplicationService =
                 new StudentApplicationService(studentManager, inputReader);
-        new Menu(studentApplicationService).start();
+        new Menu(studentApplicationService, gradeService, inputReader).start();
 
     }
 
 
-
-    static void viewStudents() {
-        IO.println("\n=============== STUDENTS ===============");
-
-        Student[] students = studentManager.getStudents();
-        if (students.length == 0) {
-            IO.println("No students have been added yet.");
-            return;
-        }
-
-        IO.println("%-8s %-20s %-10s %-10s %-10s".formatted(
-                "ID", "NAME", "TYPE", "AVERAGE", "STATUS"));
-        IO.println("--------------------------------------------------------");
-
-        double classTotal = 0;
-        for (Student student : students) {
-            double average = student.calculateAverageGrade();
-            classTotal += average;
-            IO.println("%-8s %-20s %-10s %6.2f%%   %s".formatted(
-                    student.getStudentId(),
-                    student.getName(),
-                    student.getStudentType(),
-                    average,
-                    statusText(student)));
-        }
-
-        IO.println("--------------------------------------------------------");
-        IO.println("Total students: " + students.length);
-        IO.println("Class average: %.2f%%".formatted(classTotal / students.length));
-    }
-
-    static void recordGrade() {
-        IO.println("\n============= RECORD GRADE =============");
-
-        Student student = findStudent();
-        if (student == null) {
-            return;
-        }
-
-        IO.println("\nmodel.Student: %s - %s".formatted(student.getStudentId(), student.getName()));
-        IO.println("Current average: %.2f%%".formatted(student.calculateAverageGrade()));
-
-        int subjectTypeChoice = readInt(
-                "\nmodel.Subject type (1. Core, 2. Elective): ", 1, 2);
-        Subject subject = chooseSubject(subjectTypeChoice);
-        double value = ConsoleInputReader.readDouble("model.Grade (0-100): ", 0, 100);
-        Grade grade = new Grade(student.getStudentId(), subject, value);
-
-        IO.println("\nmodel.Grade confirmation");
-        IO.println("model.Grade ID: " + grade.getGradeId());
-        IO.println("model.Student: " + student.getName());
-        IO.println("model.Subject: %s (%s)".formatted(
-                subject.getSubjectName(), subject.getSubjectType().toLowerCase()));
-        IO.println("model.Grade: %.2f%%".formatted(grade.getValue()));
-
-        String confirmation = ConsoleInputReader.readRequired("Save grade? (Y/N): ");
-        if (confirmation.equalsIgnoreCase("Y")) {
-            gradeManager.addGrade(grade);
-            student.addGrade(grade);
-            IO.println("model.Grade recorded successfully!");
-        } else {
-            IO.println("model.Grade discarded.");
-        }
-    }
 
     static void calculateStudentGPA() {
         IO.println("\n============= CALCULATE GPA =============");
@@ -109,29 +46,6 @@ public class Main {
         IO.println("Status: " + statusText(student));
     }
 
-    private static Subject chooseSubject(int subjectTypeChoice) {
-        String[] names;
-        if (subjectTypeChoice == 1) {
-            names = new String[]{"Mathematics", "English", "Science"};
-        } else {
-            names = new String[]{"Music", "Art", "Physical Education"};
-        }
-
-        IO.println("\nAvailable subjects:");
-        for (int index = 0; index < names.length; index++) {
-            IO.println("%d. %s".formatted(index + 1, names[index]));
-        }
-
-        int subjectChoice = readInt("Select subject: ", 1, names.length);
-        String name = names[subjectChoice - 1];
-        String code = subjectTypeChoice == 1
-                ? "CORE%03d".formatted(subjectChoice)
-                : "ELEC%03d".formatted(subjectChoice);
-
-        return subjectTypeChoice == 1
-                ? new CoreSubject(name, code)
-                : new ElectiveSubject(name, code);
-    }
 
     static void viewGradeReport() {
         IO.println("\n============= GRADE REPORT =============");
@@ -189,12 +103,7 @@ public class Main {
         IO.println("Status: " + student.getStatus());
     }
 
-    private static String statusText(Student student) {
-        if (student.getGrades().length == 0) {
-            return "No grades";
-        }
-        return student.isPassing() ? "Passing" : "Failing";
-    }
+
 
     static void exportGradeReport() {
         IO.println("\n========== EXPORT GRADE REPORT ==========");
