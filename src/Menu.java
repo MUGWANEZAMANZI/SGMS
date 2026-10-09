@@ -21,10 +21,11 @@ public class Menu {
             StudentApplicationService studentApplicationService,
             GradeService gradeService,
             StudentSearchService studentSearchService,
+            BulkImportService bulkImportService,
             InputReader inputReader) {
         this.studentApplicationService = studentApplicationService;
         this.inputReader = inputReader;
-        this.bulkImportService = new BulkImportService();
+        this.bulkImportService = bulkImportService;
         this.gradeService = gradeService;
         this.studentSearchService = studentSearchService;
         options.put(1, "Add model.Student");

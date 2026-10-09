@@ -2,6 +2,7 @@ import contract.InputReader;
 import controller.ConsoleInputReader;
 import controller.GPACalculator;
 import services.GradeService;
+import services.BulkImportService;
 import services.StudentApplicationService;
 import services.StudentSearchService;
 import manager.GradeManager;
@@ -34,6 +35,7 @@ public class Main {
                 studentApplicationService,
                 gradeService,
                 studentSearchService,
+                new BulkImportService(studentManager, gradeManager),
                 inputReader).start();
 
     }
