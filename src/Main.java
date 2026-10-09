@@ -1,7 +1,10 @@
 import contract.InputReader;
 import controller.ConsoleInputReader;
+import controller.GPACalculator;
 import services.GradeService;
+import services.BulkImportService;
 import services.StudentApplicationService;
+import services.StudentSearchService;
 import manager.GradeManager;
 import manager.StudentManager;
 import model.*;
@@ -18,13 +21,22 @@ public class Main {
 
     private static final StudentManager studentManager = new StudentManager();
     private static final GradeManager gradeManager = new GradeManager();
-    private static final GradeService gradeService;
+    private static final InputReader inputReader = new ConsoleInputReader();
+    private static final GradeService gradeService =
+            new GradeService(studentManager, gradeManager, inputReader);
+    private static final StudentSearchService studentSearchService =
+            new StudentSearchService(studentManager, inputReader);
+    private static final GPACalculator gpaCalculator = new GPACalculator();
 
     public static void main(String[] args) {
-        InputReader inputReader = new ConsoleInputReader();
         StudentApplicationService  studentApplicationService =
                 new StudentApplicationService(studentManager, inputReader);
-        new Menu(studentApplicationService, gradeService, inputReader).start();
+        new Menu(
+                studentApplicationService,
+                gradeService,
+                studentSearchService,
+                new BulkImportService(studentManager, gradeManager),
+                inputReader).start();
 
     }
 
@@ -32,17 +44,36 @@ public class Main {
 
     static void calculateStudentGPA() {
         IO.println("\n============= CALCULATE GPA =============");
-        String studentId = inp.readRequired("Enter the student ID to calculate GPA: ");
-
-
-        Student student = findStudent();
+        String studentId = inputReader.readRequired(
+                "Enter the student ID to calculate GPA: ").toUpperCase();
+        Student student = studentManager.findStudentById(studentId);
         if (student == null) {
+            IO.println("No student found with ID " + studentId + ".");
             return;
         }
 
+        Grade[] grades = gradeManager.getGradesByStudent(student.getStudentId());
         double average = student.calculateAverageGrade();
+        double cumulativeGpa = gpaCalculator.calculateCumulativeGPA(grades);
+
         IO.println("\nmodel.Student: %s - %s".formatted(student.getStudentId(), student.getName()));
-        IO.println("Current average: %.2f%%".formatted(average));
+        IO.println("Overall average: %.2f%%".formatted(average));
+        IO.println("\n%-22s %-12s %-8s %-8s".formatted(
+                "SUBJECT", "PERCENTAGE", "GPA", "LETTER"));
+        IO.println("--------------------------------------------------------");
+        for (Grade grade : grades) {
+            GradePoint result = gpaCalculator.convertPercentageToGPA(
+                    grade.getValue());
+            IO.println("%-22s %9.2f%% %8.1f %-8s".formatted(
+                    grade.getSubject().getSubjectName(),
+                    result.percentage(),
+                    result.gpa(),
+                    result.letterGrade()));
+        }
+        IO.println("--------------------------------------------------------");
+        IO.println("Cumulative GPA: %.2f / 4.00".formatted(cumulativeGpa));
+        IO.println("Class rank: %d of %d".formatted(
+                calculateClassRank(cumulativeGpa), studentManager.getStudentCount()));
         IO.println("Status: " + statusText(student));
     }
 
@@ -51,7 +82,8 @@ public class Main {
         IO.println("\n============= GRADE REPORT =============");
 
         GradeReportService reportService = new GradeReportService(studentManager, gradeManager);
-        String studentId = ConsoleInputReader.readRequired("Enter the student ID to view the grade report: ");
+        String studentId = inputReader.readRequired(
+                "Enter the student ID to view the grade report: ");
         GradeReport report = reportService.createReport(studentId);
         Student student = report.student();
 
@@ -86,8 +118,8 @@ public class Main {
             return null;
         }
 
-        String id = ConsoleInputReader.readRequired("model.Student ID: ").toUpperCase();
-        Student student = studentManager.findStudent(id);
+        String id = inputReader.readRequired("model.Student ID: ").toUpperCase();
+        Student student = studentManager.findStudentById(id);
         if (student == null) {
             IO.println("No student found with ID " + id + ".");
         }
@@ -108,7 +140,8 @@ public class Main {
     static void exportGradeReport() {
         IO.println("\n========== EXPORT GRADE REPORT ==========");
 
-        String studentId = ConsoleInputReader.readRequired("Enter the student ID to export: ");
+        String studentId = inputReader.readRequired(
+                "Enter the student ID to export: ");
         GradeReportService reportService = new GradeReportService(studentManager, gradeManager);
         GradeReport report = reportService.createReport(studentId);
 
@@ -127,6 +160,25 @@ public class Main {
 
 
     public static void pause() {
-        IO.readln("\nPress Enter to continue...");
+        inputReader.pause();
+    }
+
+    private static String statusText(Student student) {
+        if (student.getGrades().length == 0) {
+            return "No grades";
+        }
+        return student.isPassing() ? "Passing" : "Failing";
+    }
+
+    private static int calculateClassRank(double studentGpa) {
+        int rank = 1;
+        for (Student student : studentManager.getStudents()) {
+            double classGpa = gpaCalculator.calculateCumulativeGPA(
+                    gradeManager.getGradesByStudent(student.getStudentId()));
+            if (classGpa > studentGpa) {
+                rank++;
+            }
+        }
+        return rank;
     }
 }

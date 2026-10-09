@@ -456,7 +456,7 @@ STU001,Music,Elective,78
 
 #### Interface Segregation Principle (ISP)
 
-- Create focused interfaces: `Searchable`, `Exportable`, `Calculable`
+- Create focused interfaces: `Searchable`, `Exportable`, `GradeScale`
 - Clients only depend on methods they use
 
 #### Dependency Inversion Principle (DIP)

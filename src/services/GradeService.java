@@ -1,10 +1,11 @@
 package services;
 
 import contract.InputReader;
-import controller.ConsoleInputReader;
 import manager.GradeManager;
 import manager.StudentManager;
 import model.*;
+
+import java.util.Objects;
 
 public class GradeService {
     private final StudentManager studentManager;
@@ -13,9 +14,9 @@ public class GradeService {
 
     public GradeService(StudentManager studentManager, GradeManager gradeManager, InputReader inputReader
     ) {
-        this.studentManager = studentManager;
-        this.gradeManager = gradeManager;
-        this.inputReader = inputReader;
+        this.studentManager = Objects.requireNonNull(studentManager);
+        this.gradeManager = Objects.requireNonNull(gradeManager);
+        this.inputReader = Objects.requireNonNull(inputReader);
     }
 
      public void recordGrade() {
@@ -23,6 +24,10 @@ public class GradeService {
         String studentId = inputReader.readRequired("Enter the student ID to record a grade: ");
 
         Student student = studentManager.findStudentById(studentId);
+        if (student == null) {
+            IO.println("No student found with ID " + studentId + ".");
+            return;
+        }
 
         IO.println("\nmodel.Student: %s - %s".formatted(student.getStudentId(), student.getName()));
         IO.println("Current average: %.2f%%".formatted(student.calculateAverageGrade()));
@@ -31,19 +36,15 @@ public class GradeService {
                 "\nmodel.Subject type (1. Core, 2. Elective): ", 1, 2);
         Subject subject = chooseSubject(subjectTypeChoice);
         double value = inputReader.readDouble("model.Grade (0-100): ", 0, 100);
-        Grade grade = new Grade(student.getStudentId(), subject, value);
-
         IO.println("\nmodel.Grade confirmation");
-        IO.println("model.Grade ID: " + grade.getGradeId());
         IO.println("model.Student: " + student.getName());
         IO.println("model.Subject: %s (%s)".formatted(
                 subject.getSubjectName(), subject.getSubjectType().toLowerCase()));
-        IO.println("model.Grade: %.2f%%".formatted(grade.getValue()));
+        IO.println("model.Grade: %.2f%%".formatted(value));
 
         String confirmation = inputReader.readRequired("Save grade? (Y/N): ");
         if (confirmation.equalsIgnoreCase("Y")) {
-            gradeManager.addGrade(grade);
-            student.addGrade(grade);
+            gradeManager.recordGrade(student, subject, value);
             IO.println("model.Grade recorded successfully!");
         } else {
             IO.println("model.Grade discarded.");
