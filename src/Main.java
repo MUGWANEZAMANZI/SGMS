@@ -1,3 +1,14 @@
+import manager.GradeManager;
+import manager.StudentManager;
+import model.*;
+import report.GradeReport;
+import report.GradeReportService;
+import report.TextGradeReportExporter;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+
 public class Main {
 
     private static final StudentManager studentManager = new StudentManager();
@@ -14,8 +25,13 @@ public class Main {
                 case 2 -> viewStudents();
                 case 3 -> recordGrade();
                 case 4 -> viewGradeReport();
-                case 5 -> {
-                    IO.println("\nThank you for using Student Grade Management System!");
+                case 5 -> exportGradeReport();
+//                case 6 -> calculateStudentGPA();
+//                case 7 -> bulkImportGrades();
+//                case 8 -> viewClassStatistics();
+//                case 9 -> searchStudents();
+                case 10 -> {
+                    IO.println("\nThank you for using model.Student model.Grade Management System!");
                     IO.println("Goodbye!");
                     return false;
                 }
@@ -35,7 +51,7 @@ public class Main {
         String email = readRequired("Email: ");
         String phone = readRequired("Phone: ");
 
-        IO.println("\nStudent type:");
+        IO.println("\nmodel.Student type:");
         IO.println("1. Regular student (passing grade: 50%)");
         IO.println("2. Honors student (passing grade: 60%)");
         int type = readInt("Select type: ", 1, 2);
@@ -46,7 +62,7 @@ public class Main {
 
         studentManager.addStudent(student);
 
-        IO.println("\nStudent added successfully!");
+        IO.println("\nmodel.Student added successfully!");
         printStudentSummary(student);
     }
 
@@ -88,29 +104,29 @@ public class Main {
             return;
         }
 
-        IO.println("\nStudent: %s - %s".formatted(student.getStudentId(), student.getName()));
+        IO.println("\nmodel.Student: %s - %s".formatted(student.getStudentId(), student.getName()));
         IO.println("Current average: %.2f%%".formatted(student.calculateAverageGrade()));
 
         int subjectTypeChoice = readInt(
-                "\nSubject type (1. Core, 2. Elective): ", 1, 2);
+                "\nmodel.Subject type (1. Core, 2. Elective): ", 1, 2);
         Subject subject = chooseSubject(subjectTypeChoice);
-        double value = readDouble("Grade (0-100): ", 0, 100);
+        double value = readDouble("model.Grade (0-100): ", 0, 100);
         Grade grade = new Grade(student.getStudentId(), subject, value);
 
-        IO.println("\nGrade confirmation");
-        IO.println("Grade ID: " + grade.getGradeId());
-        IO.println("Student: " + student.getName());
-        IO.println("Subject: %s (%s)".formatted(
+        IO.println("\nmodel.Grade confirmation");
+        IO.println("model.Grade ID: " + grade.getGradeId());
+        IO.println("model.Student: " + student.getName());
+        IO.println("model.Subject: %s (%s)".formatted(
                 subject.getSubjectName(), subject.getSubjectType().toLowerCase()));
-        IO.println("Grade: %.2f%%".formatted(grade.getValue()));
+        IO.println("model.Grade: %.2f%%".formatted(grade.getValue()));
 
         String confirmation = readRequired("Save grade? (Y/N): ");
         if (confirmation.equalsIgnoreCase("Y")) {
             gradeManager.addGrade(grade);
             student.addGrade(grade);
-            IO.println("Grade recorded successfully!");
+            IO.println("model.Grade recorded successfully!");
         } else {
-            IO.println("Grade discarded.");
+            IO.println("model.Grade discarded.");
         }
     }
 
@@ -141,25 +157,29 @@ public class Main {
     private static void viewGradeReport() {
         IO.println("\n============= GRADE REPORT =============");
 
-        Student student = findStudent();
-        if (student == null) {
-            return;
-        }
+        GradeReportService reportService = new GradeReportService(studentManager, gradeManager);
+        String studentId = readRequired("Enter the student ID to view the grade report: ");
+        GradeReport report = reportService.createReport(studentId);
+        Student student = report.student();
 
-        IO.println("\nStudent: %s - %s".formatted(student.getStudentId(), student.getName()));
+        IO.println("\nmodel.Student: %s - %s".formatted(student.getStudentId(), student.getName()));
         IO.println("Type: " + student.getStudentType());
         IO.println("Passing grade: %.0f%%".formatted(student.getPassingGrade()));
-        IO.println("Average: %.2f%%".formatted(student.calculateAverageGrade()));
-        IO.println("Status: " + statusText(student));
+        IO.println("Overall average: %.2f%%".formatted(report.overallAverage()));
+        IO.println("Core average: %.2f%%".formatted(report.coreAverage()));
+        IO.println("Elective average: %.2f%%".formatted(report.electiveAverage()));
 
-        Grade[] grades = gradeManager.getGradesByStudent(student.getStudentId());
+        //Ternary operator to determine the status of the student based on the grades and passing criteria
+        String status = report.grades().length == 0 ? "No grades" : report.passing() ? "Passing" : "Failing";
+        IO.println("Status: " + status);
+
+        Grade[] grades = report.grades();
         if (grades.length == 0) {
             IO.println("\nNo grades recorded for this student.");
             return;
         }
 
-        IO.println("\nGRADE HISTORY");
-        IO.println("%-8s %-22s %-10s %8s  %-12s".formatted(
+        IO.println("\n%-8s %-22s %-10s %-10s %-12s".formatted(
                 "ID", "SUBJECT", "TYPE", "GRADE", "DATE"));
         IO.println("--------------------------------------------------------");
         for (Grade grade : grades) {
@@ -173,7 +193,7 @@ public class Main {
             return null;
         }
 
-        String id = readRequired("Student ID: ").toUpperCase();
+        String id = readRequired("model.Student ID: ").toUpperCase();
         Student student = studentManager.findStudent(id);
         if (student == null) {
             IO.println("No student found with ID " + id + ".");
@@ -182,7 +202,7 @@ public class Main {
     }
 
     private static void printStudentSummary(Student student) {
-        IO.println("Student ID: " + student.getStudentId());
+        IO.println("model.Student ID: " + student.getStudentId());
         IO.println("Name: " + student.getName());
         IO.println("Type: " + student.getStudentType());
         IO.println("Age: " + student.getAge());
@@ -196,6 +216,25 @@ public class Main {
         }
         return student.isPassing() ? "Passing" : "Failing";
     }
+
+    private static void exportGradeReport() {
+        IO.println("\n========== EXPORT GRADE REPORT ==========");
+
+        String studentId = readRequired("Enter the student ID to export: ");
+        GradeReportService reportService = new GradeReportService(studentManager, gradeManager);
+        GradeReport report = reportService.createReport(studentId);
+
+        Path directory = Path.of("grade_reports");
+        Path file = directory.resolve(studentId.toUpperCase() + "_report.txt");
+        try {
+            Files.createDirectories(directory);
+            new TextGradeReportExporter().export(report, file);
+            IO.println("Report exported to " + file.toAbsolutePath());
+        } catch (IOException exception) {
+            throw new IllegalStateException("Could not export report: " + exception.getMessage(), exception);
+        }
+    }
+
 
     public static int readInt(String prompt, int minimum, int maximum) {
         while (true) {
@@ -219,7 +258,7 @@ public class Main {
                     return value;
                 }
             } catch (NumberFormatException ignored) {
-                // Repeat the prompt with a clear message below.
+                IO.println("The enter value is not valid. Please enter a valid number.");
             }
             IO.println("Enter a number from %.0f to %.0f.".formatted(minimum, maximum));
         }

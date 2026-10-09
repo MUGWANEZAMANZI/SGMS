@@ -1,4 +1,4 @@
-# Student Grade Management System: Use-Case Diagram
+# model.Student model.Grade Management System: Use-Case Diagram
 
 This use-case diagram represents the current lab scope. The Teacher or
 Academic Administrator is the primary actor and interacts with the console
@@ -8,7 +8,7 @@ application to manage students and grades.
 flowchart LR
     teacher[Teacher / Academic Administrator]
 
-    subgraph system[Student Grade Management System]
+    subgraph system[model.Student model.Grade Management System]
         add((Add student))
         view((View all students))
         record((Record grade))
@@ -22,16 +22,16 @@ flowchart LR
     subgraph classes[Implemented Java classes and types]
         main[Main]
         menu[Menu]
-        student[Student]
-        regular[RegularStudent]
-        honors[HonorsStudent]
-        subject[Subject]
-        core[CoreSubject]
-        elective[ElectiveSubject]
-        grade[Grade]
-        studentManager[StudentManager]
-        gradeManager[GradeManager]
-        gradable[Gradable]
+        student[model.Student]
+        regular[model.RegularStudent]
+        honors[model.HonorsStudent]
+        subject[model.Subject]
+        core[model.CoreSubject]
+        elective[model.ElectiveSubject]
+        grade[model.Grade]
+        studentManager[manager.StudentManager]
+        gradeManager[manager.GradeManager]
+        gradable[contract.Gradable]
         viewHelper[StudentView]
     end
 
@@ -84,13 +84,13 @@ flowchart LR
 | `Main` | Coordinates the application operations and input validation |
 | `Menu` | Displays the menu and controls navigation |
 | `Student` | Abstract student state, grade array, and calculations |
-| `RegularStudent` | Student subtype with a 50% passing threshold |
-| `HonorsStudent` | Student subtype with a 60% passing threshold and honors eligibility |
+| `RegularStudent` | model.Student subtype with a 50% passing threshold |
+| `HonorsStudent` | model.Student subtype with a 60% passing threshold and honors eligibility |
 | `Subject` | Abstract subject state and behavior |
 | `CoreSubject` | Mandatory subject implementation |
 | `ElectiveSubject` | Optional subject implementation |
 | `Grade` | Validated grade value, subject, student ID, and date |
 | `StudentManager` | Array-backed student storage and lookup |
 | `GradeManager` | Array-backed grade history and lookup |
-| `Gradable` | Grade validation and recording contract |
-| `StudentView` | Student display helper |
+| `Gradable` | model.Grade validation and recording contract |
+| `StudentView` | model.Student display helper |

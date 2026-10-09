@@ -1,3 +1,5 @@
+package model;
+
 public class ElectiveSubject extends Subject {
 
     public ElectiveSubject(String subjectName, String subjectCode) {

@@ -1,3 +1,5 @@
+package model;
+
 import java.time.LocalDate;
 import java.util.Objects;
 
@@ -13,15 +15,15 @@ public class Grade {
 
     public Grade(String studentId, Subject subject, double value) {
         if (studentId == null || studentId.isBlank()) {
-            throw new IllegalArgumentException("Student ID cannot be blank");
+            throw new IllegalArgumentException("model.Student ID cannot be blank");
         }
         if (value < 0 || value > 100) {
-            throw new IllegalArgumentException("Grade must be between 0 and 100");
+            throw new IllegalArgumentException("model.Grade must be between 0 and 100");
         }
 
         this.gradeId = "GRD%03d".formatted(nextGradeNumber++);
         this.studentId = studentId;
-        this.subject = Objects.requireNonNull(subject, "Subject cannot be null");
+        this.subject = Objects.requireNonNull(subject, "model.Subject cannot be null");
         this.value = value;
         this.recordedAt = LocalDate.now();
     }

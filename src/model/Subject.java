@@ -1,3 +1,5 @@
+package model;
+
 public abstract class Subject {
 
     private final String subjectName;
@@ -5,10 +7,10 @@ public abstract class Subject {
 
     protected Subject(String subjectName, String subjectCode) {
         if (subjectName == null || subjectName.isBlank()) {
-            throw new IllegalArgumentException("Subject name cannot be blank");
+            throw new IllegalArgumentException("model.Subject name cannot be blank");
         }
         if (subjectCode == null || subjectCode.isBlank()) {
-            throw new IllegalArgumentException("Subject code cannot be blank");
+            throw new IllegalArgumentException("model.Subject code cannot be blank");
         }
         this.subjectName = subjectName.trim();
         this.subjectCode = subjectCode.trim();
