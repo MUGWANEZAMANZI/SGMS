@@ -1,3 +1,6 @@
+import contract.InputReader;
+import controller.ConsoleInputReader;
+import controller.StudentApplicationService;
 import manager.GradeManager;
 import manager.StudentManager;
 import model.*;
@@ -9,64 +12,24 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+
 public class Main {
 
     private static final StudentManager studentManager = new StudentManager();
     private static final GradeManager gradeManager = new GradeManager();
 
+
     public static void main(String[] args) {
-        new Menu().start();
+        InputReader inputReader = new ConsoleInputReader();
+        StudentApplicationService  studentApplicationService =
+                new StudentApplicationService(studentManager, inputReader);
+        new Menu(studentApplicationService).start();
+
     }
 
-    public static boolean operations(int option) {
-        try {
-            switch (option) {
-                case 1 -> addStudent();
-                case 2 -> viewStudents();
-                case 3 -> recordGrade();
-                case 4 -> viewGradeReport();
-                case 5 -> exportGradeReport();
-                case 6 -> calculateStudentGPA();
-//                case 7 -> bulkImportGrades();
-//                case 8 -> viewClassStatistics();
-//                case 9 -> searchStudents();
-                case 10 -> {
-                    IO.println("\nThank you for using model.Student model.Grade Management System!");
-                    IO.println("Goodbye!");
-                    return false;
-                }
-                default -> IO.println("Invalid option.");
-            }
-        } catch (IllegalArgumentException | IllegalStateException exception) {
-            IO.println("\nInput error: " + exception.getMessage());
-        }
-        return true;
-    }
 
-    private static void addStudent() {
-        IO.println("\n============= ADD STUDENT =============");
 
-        String name = readRequired("Name: ");
-        int age = readInt("Age: ", 1, 120);
-        String email = readRequired("Email: ");
-        String phone = readRequired("Phone: ");
-
-        IO.println("\nmodel.Student type:");
-        IO.println("1. Regular student (passing grade: 50%)");
-        IO.println("2. Honors student (passing grade: 60%)");
-        int type = readInt("Select type: ", 1, 2);
-
-        Student student = type == 1
-                ? new RegularStudent(name, age, email, phone)
-                : new HonorsStudent(name, age, email, phone);
-
-        studentManager.addStudent(student);
-
-        IO.println("\nmodel.Student added successfully!");
-        printStudentSummary(student);
-    }
-
-    private static void viewStudents() {
+    static void viewStudents() {
         IO.println("\n=============== STUDENTS ===============");
 
         Student[] students = studentManager.getStudents();
@@ -96,7 +59,7 @@ public class Main {
         IO.println("Class average: %.2f%%".formatted(classTotal / students.length));
     }
 
-    private static void recordGrade() {
+    static void recordGrade() {
         IO.println("\n============= RECORD GRADE =============");
 
         Student student = findStudent();
@@ -110,7 +73,7 @@ public class Main {
         int subjectTypeChoice = readInt(
                 "\nmodel.Subject type (1. Core, 2. Elective): ", 1, 2);
         Subject subject = chooseSubject(subjectTypeChoice);
-        double value = readDouble("model.Grade (0-100): ", 0, 100);
+        double value = ConsoleInputReader.readDouble("model.Grade (0-100): ", 0, 100);
         Grade grade = new Grade(student.getStudentId(), subject, value);
 
         IO.println("\nmodel.Grade confirmation");
@@ -120,7 +83,7 @@ public class Main {
                 subject.getSubjectName(), subject.getSubjectType().toLowerCase()));
         IO.println("model.Grade: %.2f%%".formatted(grade.getValue()));
 
-        String confirmation = readRequired("Save grade? (Y/N): ");
+        String confirmation = ConsoleInputReader.readRequired("Save grade? (Y/N): ");
         if (confirmation.equalsIgnoreCase("Y")) {
             gradeManager.addGrade(grade);
             student.addGrade(grade);
@@ -130,9 +93,9 @@ public class Main {
         }
     }
 
-    private static void calculateStudentGPA() {
+    static void calculateStudentGPA() {
         IO.println("\n============= CALCULATE GPA =============");
-        String studentId = readRequired("Enter the student ID to calculate GPA: ");
+        String studentId = inp.readRequired("Enter the student ID to calculate GPA: ");
 
 
         Student student = findStudent();
@@ -170,11 +133,11 @@ public class Main {
                 : new ElectiveSubject(name, code);
     }
 
-    private static void viewGradeReport() {
+    static void viewGradeReport() {
         IO.println("\n============= GRADE REPORT =============");
 
         GradeReportService reportService = new GradeReportService(studentManager, gradeManager);
-        String studentId = readRequired("Enter the student ID to view the grade report: ");
+        String studentId = ConsoleInputReader.readRequired("Enter the student ID to view the grade report: ");
         GradeReport report = reportService.createReport(studentId);
         Student student = report.student();
 
@@ -209,7 +172,7 @@ public class Main {
             return null;
         }
 
-        String id = readRequired("model.Student ID: ").toUpperCase();
+        String id = ConsoleInputReader.readRequired("model.Student ID: ").toUpperCase();
         Student student = studentManager.findStudent(id);
         if (student == null) {
             IO.println("No student found with ID " + id + ".");
@@ -233,10 +196,10 @@ public class Main {
         return student.isPassing() ? "Passing" : "Failing";
     }
 
-    private static void exportGradeReport() {
+    static void exportGradeReport() {
         IO.println("\n========== EXPORT GRADE REPORT ==========");
 
-        String studentId = readRequired("Enter the student ID to export: ");
+        String studentId = ConsoleInputReader.readRequired("Enter the student ID to export: ");
         GradeReportService reportService = new GradeReportService(studentManager, gradeManager);
         GradeReport report = reportService.createReport(studentId);
 
@@ -252,43 +215,7 @@ public class Main {
     }
 
 
-    public static int readInt(String prompt, int minimum, int maximum) {
-        while (true) {
-            try {
-                int value = Integer.parseInt(readRequired(prompt));
-                if (value >= minimum && value <= maximum) {
-                    return value;
-                }
-            } catch (NumberFormatException ignored) {
-                // Repeat the prompt with a clear message below.
-            }
-            IO.println("Enter a whole number from %d to %d.".formatted(minimum, maximum));
-        }
-    }
 
-    private static double readDouble(String prompt, double minimum, double maximum) {
-        while (true) {
-            try {
-                double value = Double.parseDouble(readRequired(prompt));
-                if (value >= minimum && value <= maximum) {
-                    return value;
-                }
-            } catch (NumberFormatException ignored) {
-                IO.println("The enter value is not valid. Please enter a valid number.");
-            }
-            IO.println("Enter a number from %.0f to %.0f.".formatted(minimum, maximum));
-        }
-    }
-
-    private static String readRequired(String prompt) {
-        while (true) {
-            String value = IO.readln(prompt);
-            if (value != null && !value.isBlank()) {
-                return value.trim();
-            }
-            IO.println("This value is required.");
-        }
-    }
 
     public static void pause() {
         IO.readln("\nPress Enter to continue...");
