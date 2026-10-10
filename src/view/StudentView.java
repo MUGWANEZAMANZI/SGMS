@@ -1,3 +1,5 @@
+package view;
+
 import model.Student;
 
 public final class StudentView {

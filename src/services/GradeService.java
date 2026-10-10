@@ -1,6 +1,6 @@
 package services;
 
-import contract.InputReader;
+import input.InputReader;
 import manager.GradeManager;
 import manager.StudentManager;
 import model.*;

@@ -1,4 +1,4 @@
-package contract;
+package input;
 
 public interface InputReader {
     int readInt(String prompt, int minimum, int max);

@@ -1,4 +1,4 @@
-package contract;
+package manager;
 
 import model.Student;
 
