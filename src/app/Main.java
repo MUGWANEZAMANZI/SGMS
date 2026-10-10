@@ -1,6 +1,8 @@
-import contract.InputReader;
-import controller.ConsoleInputReader;
-import controller.GPACalculator;
+package app;
+
+import input.InputReader;
+import input.ConsoleInputReader;
+import grading.GPACalculator;
 import services.GradeService;
 import services.BulkImportService;
 import services.StudentApplicationService;
@@ -11,6 +13,7 @@ import model.*;
 import report.GradeReport;
 import report.GradeReportService;
 import report.TextGradeReportExporter;
+import view.Menu;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -42,7 +45,7 @@ public class Main {
 
 
 
-    static void calculateStudentGPA() {
+    public static void calculateStudentGPA() {
         IO.println("\n============= CALCULATE GPA =============");
         String studentId = inputReader.readRequired(
                 "Enter the student ID to calculate GPA: ").toUpperCase();
@@ -78,7 +81,7 @@ public class Main {
     }
 
 
-    static void viewGradeReport() {
+    public static void viewGradeReport() {
         IO.println("\n============= GRADE REPORT =============");
 
         GradeReportService reportService = new GradeReportService(studentManager, gradeManager);
@@ -137,7 +140,7 @@ public class Main {
 
 
 
-    static void exportGradeReport() {
+    public static void exportGradeReport() {
         IO.println("\n========== EXPORT GRADE REPORT ==========");
 
         String studentId = inputReader.readRequired(

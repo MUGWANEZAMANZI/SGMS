@@ -1,6 +1,5 @@
-package controller;
+package grading;
 
-import contract.GradeScale;
 import model.GradePoint;
 
 public class FourPointGradeScale implements GradeScale {
@@ -43,4 +42,3 @@ public class FourPointGradeScale implements GradeScale {
         return new GradePoint(percentage, 0.0, "F");
     }
 }
-

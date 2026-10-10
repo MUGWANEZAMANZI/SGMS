@@ -1,8 +1,7 @@
 package services;
 
-import contract.GradeScale;
-import contract.InputReader;
-import controller.FourPointGradeScale;
+import grading.GradeScale;
+import input.InputReader;
 import manager.GradeManager;
 import manager.StudentManager;
 import model.GradePoint;

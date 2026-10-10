@@ -1,4 +1,4 @@
-package contract;
+package grading;
 
 import model.GradePoint;
 

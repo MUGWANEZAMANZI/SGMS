@@ -1,6 +1,6 @@
 package services;
 
-import contract.InputReader;
+import input.InputReader;
 import manager.StudentManager;
 import model.HonorsStudent;
 import model.RegularStudent;

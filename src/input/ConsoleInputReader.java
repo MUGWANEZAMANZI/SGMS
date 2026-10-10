@@ -1,6 +1,4 @@
-package controller;
-
-import contract.InputReader;
+package input;
 
 public class ConsoleInputReader implements InputReader {
 
@@ -13,7 +11,7 @@ public class ConsoleInputReader implements InputReader {
                     return value;
                 }
             } catch (NumberFormatException ignored) {
-                // Repeat the prompt with a clear message below.
+                IO.println("The enter value is not valid. Please enter a valid whole number.");
             }
             IO.println("Enter a whole number from %d to %d.".formatted(minimum, maximum));
         }
@@ -67,18 +65,18 @@ public class ConsoleInputReader implements InputReader {
             String value = IO.readln(prompt);
             if (value != null && !value.isBlank()) {
                 try{
-                    if(value.contains(".") || !(Double.parseDouble(value) == (int) Double.parseDouble(value)))
+                    if(value.contains(".") || !(Double.parseDouble(value) == Double.parseDouble(value)))
                     {
                         return value.trim();
                     }else{
-                        IO.println("Invalid name format.");
+                        IO.println("Invalid name format. Failed bug check.");
                         break;
                     }
                 } catch (NumberFormatException e) {
-                    IO.println("Invalid name format.");
+                    IO.println("Invalid name format. Cannot be a number.");
                 }
             }else{
-                IO.println("This Name field is required.");
+                IO.println("This Name field is required. JJJ");
             }
         }
         return null;

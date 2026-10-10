@@ -60,7 +60,7 @@ flowchart LR
         grade[model.Grade]
         studentManager[manager.StudentManager]
         gradeManager[manager.GradeManager]
-        gradable[contract.Gradable]
+        gradable[manager.Gradable]
         viewHelper[StudentView]
     end
 
@@ -110,22 +110,23 @@ Java 25 is recommended because the application uses `IO.readln`,
 ```text
 SGMS/
 ├── src/
-│   ├── Main.java             # Application operations and input validation
-│   ├── Menu.java             # Console menu and navigation loop
-│   ├── model.Student.java          # Abstract student model and grade array
-│   ├── model.RegularStudent.java   # 50% passing threshold
-│   ├── model.HonorsStudent.java    # 60% passing threshold and honors eligibility
-│   ├── model.Subject.java          # Abstract subject model
-│   ├── model.CoreSubject.java      # Mandatory subject implementation
-│   ├── model.ElectiveSubject.java  # Optional subject implementation
-│   ├── model.Grade.java            # model.Grade model and validation
-│   ├── manager.StudentManager.java   # Array-backed student storage
-│   ├── manager.GradeManager.java     # Array-backed grade history
-│   ├── contract.Gradable.java         # model.Grade validation contract
-│   └── StudentView.java      # model.Student display helper
+│   ├── app/
+│   │   └── Main.java                # Application bootstrap and wiring
+│   ├── view/
+│   │   ├── Menu.java                # Console menu and navigation loop
+│   │   └── StudentView.java         # Student display helper
+│   ├── input/
+│   │   └── ConsoleInputReader.java  # Console input adapter and validation
+│   ├── grading/
+│   │   ├── FourPointGradeScale.java # Percentage-to-GPA grading policy
+│   │   └── GPACalculator.java       # GPA calculations
+│   ├── model/                       # Domain entities and value objects
+│   ├── manager/                     # In-memory data and search contracts
+│   ├── services/                    # Application use cases and CSV contract
+│   └── report/                      # Report models, contracts, and exporters
 ├── docs/
 │   └── use-case-diagram.md   # Use-case diagram for the lab submission
-└── model.Student-model.Grade-Mgt-I.md    # Original lab brief and user stories
+└── Student-Grade-Mgt-I.md    # Original lab brief and user stories
 ```
 
 ## Running the application
@@ -134,7 +135,7 @@ SGMS/
 
 1. Open the project in IntelliJ IDEA.
 2. Ensure the project SDK is Java 25 or newer.
-3. Run `src/Main.java`.
+3. Run `src/app/Main.java`.
 
 ### Command line
 
@@ -142,8 +143,8 @@ From the project root, compile the source files and start the application:
 
 ```powershell
 New-Item -ItemType Directory -Force out | Out-Null
-javac -d out src\*.java
-java -cp out Main
+javac -d out $(Get-ChildItem -Path src -Recurse -Filter *.java | Select-Object -ExpandProperty FullName)
+java -cp out app.Main
 ```
 
 On macOS or Linux, use `src/*.java` instead of `src\*.java`.

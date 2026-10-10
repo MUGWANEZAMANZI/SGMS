@@ -31,7 +31,7 @@ flowchart LR
         grade[model.Grade]
         studentManager[manager.StudentManager]
         gradeManager[manager.GradeManager]
-        gradable[contract.Gradable]
+        gradable[manager.Gradable]
         viewHelper[StudentView]
     end
 
@@ -92,5 +92,5 @@ flowchart LR
 | `Grade` | Validated grade value, subject, student ID, and date |
 | `StudentManager` | Array-backed student storage and lookup |
 | `GradeManager` | Array-backed grade history and lookup |
-| `Gradable` | model.Grade validation and recording contract |
+| `Gradable` | model.Grade validation and recording contract in `manager` |
 | `StudentView` | model.Student display helper |
