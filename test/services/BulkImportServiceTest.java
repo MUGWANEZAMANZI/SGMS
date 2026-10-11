@@ -3,10 +3,11 @@ package services;
 import manager.GradeManager;
 import manager.StudentManager;
 import model.RegularStudent;
+import model.Student;
 import org.junit.jupiter.api.Test;
 
-import java.io.ByteArrayOutputStream;
-import java.io.PrintStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -17,33 +18,41 @@ class BulkImportServiceTest {
         StudentManager studentManager = new StudentManager();
         GradeManager gradeManager = new GradeManager();
 
-        addStudents(studentManager, 5);
+        Student[] students = addStudents(studentManager, 5);
+        Path csvFile = Files.createTempFile("grades-", ".csv");
+        StringBuilder csv = new StringBuilder("studentId,subject,type,grade\n");
+        for (Student student : students) {
+            for (int grade = 0; grade < 20; grade++) {
+                csv.append(student.getStudentId())
+                        .append(",Mathematics,Core,")
+                        .append(grade + 1)
+                        .append("\n");
+            }
+        }
+        Files.writeString(csvFile, csv);
 
         BulkImportService service =
                 new BulkImportService(studentManager, gradeManager);
 
-        ByteArrayOutputStream output = new ByteArrayOutputStream();
-        PrintStream originalOutput = System.out;
-
         try {
-            System.setOut(new PrintStream(output));
-
-            service.importCSV("imports/grades_100.csv");
+            service.importCSV(csvFile.toString());
+            assertEquals(100, gradeManager.getGradeCount());
         } finally {
-            System.setOut(originalOutput);
+            Files.deleteIfExists(csvFile);
         }
-
-        assertEquals(100, gradeManager.getGradeCount());
     }
 
-    private static void addStudents(StudentManager studentManager, int count) {
-        for (int index = 1; index <= count; index++) {
-            studentManager.addStudent(new RegularStudent(
+    private static Student[] addStudents(StudentManager studentManager, int count) {
+        Student[] students = new Student[count];
+        for (int index = 0; index < count; index++) {
+            Student student = new RegularStudent(
                     "Student" + index,
                     20,
                     "student" + index + "@example.com",
-                    "071234567" + index
-            ));
+                    "071234567" + index);
+            studentManager.addStudent(student);
+            students[index] = student;
         }
+        return students;
     }
 }
