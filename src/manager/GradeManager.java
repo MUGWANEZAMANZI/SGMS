@@ -52,4 +52,8 @@ public class GradeManager implements Gradable {
     public int getGradeCount() {
         return gradeCount;
     }
+
+    public Grade[] getGrades() {
+        return Arrays.copyOf(grades, gradeCount);
+    }
 }
