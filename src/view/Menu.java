@@ -88,7 +88,7 @@ public class Menu {
                 case 4 -> Main.viewGradeReport();
                 case 5 -> Main.exportGradeReport();
                 case 6 -> Main.calculateStudentGPA();
-                case 7 -> bulkImportService.importCSV("path/to/grades.csv");
+                case 7 -> bulkImportService.importCSV("imports/grades_100.csv");
                 case 8 ->  statisticsView.displayStatistics();
                 case 9 -> studentSearchService.search();
                 case 10 -> {
