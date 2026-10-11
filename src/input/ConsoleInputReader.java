@@ -64,23 +64,17 @@ public class ConsoleInputReader implements InputReader {
         while (true) {
             String value = IO.readln(prompt);
             if (value != null && !value.isBlank()) {
-                try{
-                    if(value.contains(".") || !(Double.parseDouble(value) == Double.parseDouble(value)))
-                    {
-                        return value.trim();
-                    }else{
-                        IO.println("Invalid name format. Failed bug check.");
-                        break;
-                    }
+                String trimmedValue = value.trim();
+                try {
+                    Double.parseDouble(trimmedValue);
+                    IO.println("Invalid name format. A name cannot be a number.");
                 } catch (NumberFormatException e) {
-                    IO.println("Invalid name format. Cannot be a number.");
+                    return trimmedValue;
                 }
-            }else{
-                IO.println("This Name field is required. JJJ");
+            } else {
+                IO.println("This Name field is required.");
             }
         }
-        return null;
-
     }
 
     @Override
