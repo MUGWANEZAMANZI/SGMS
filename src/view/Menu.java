@@ -10,6 +10,7 @@ import services.StudentSearchService;
 import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import view.StatisticsView;
 
 public class Menu {
 
@@ -19,18 +20,20 @@ public class Menu {
     private final BulkImportService bulkImportService;
     private final GradeService gradeService;
     private final StudentSearchService studentSearchService;
-
+    private final StatisticsView statisticsView;
     public Menu(
             StudentApplicationService studentApplicationService,
             GradeService gradeService,
             StudentSearchService studentSearchService,
             BulkImportService bulkImportService,
-            InputReader inputReader) {
+            InputReader inputReader,
+            StatisticsView statisticsView) {
         this.studentApplicationService = studentApplicationService;
         this.inputReader = inputReader;
         this.bulkImportService = bulkImportService;
         this.gradeService = gradeService;
         this.studentSearchService = studentSearchService;
+        this.statisticsView = statisticsView;
 
 
 
@@ -86,7 +89,7 @@ public class Menu {
                 case 5 -> Main.exportGradeReport();
                 case 6 -> Main.calculateStudentGPA();
                 case 7 -> bulkImportService.importCSV("path/to/grades.csv");
-                case 8 -> IO.println("Class statistics are not implemented yet.");
+                case 8 ->  statisticsView.displayStatistics();
                 case 9 -> studentSearchService.search();
                 case 10 -> {
                     IO.println("\nThank you for using the Student Grade Management System!");
