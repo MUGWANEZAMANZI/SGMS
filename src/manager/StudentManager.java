@@ -1,6 +1,5 @@
 package manager;
 
-import contract.Searchable;
 import model.Student;
 
 import java.util.Arrays;

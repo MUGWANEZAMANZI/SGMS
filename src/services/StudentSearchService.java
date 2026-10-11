@@ -1,7 +1,7 @@
 package services;
 
-import contract.InputReader;
-import contract.Searchable;
+import input.InputReader;
+import manager.Searchable;
 import model.Student;
 
 import java.util.Objects;

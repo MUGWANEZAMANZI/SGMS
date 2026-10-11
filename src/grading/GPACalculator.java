@@ -1,6 +1,5 @@
-package controller;
+package grading;
 
-import contract.GradeScale;
 import model.Grade;
 import model.GradePoint;
 

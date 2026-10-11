@@ -1,4 +1,7 @@
-import contract.InputReader;
+package view;
+
+import app.Main;
+import input.InputReader;
 import services.BulkImportService;
 import services.GradeService;
 import services.StudentApplicationService;
@@ -28,6 +31,9 @@ public class Menu {
         this.bulkImportService = bulkImportService;
         this.gradeService = gradeService;
         this.studentSearchService = studentSearchService;
+
+
+
         options.put(1, "Add model.Student");
         options.put(2, "View Students");
         options.put(3, "Record model.Grade");
