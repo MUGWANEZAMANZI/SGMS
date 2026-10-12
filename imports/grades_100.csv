@@ -1,0 +1,101 @@
+studentId,subject,type,grade
+STU001,Mathematics,Core,78
+STU001,English,Core,84
+STU001,Science,Core,91
+STU001,Music,Elective,73
+STU001,Art,Elective,88
+STU001,Physical Education,Elective,95
+STU001,Mathematics,Core,82
+STU001,English,Core,76
+STU001,Science,Core,89
+STU001,Music,Elective,80
+STU002,Mathematics,Core,65
+STU002,English,Core,72
+STU002,Science,Core,79
+STU002,Music,Elective,68
+STU002,Art,Elective,74
+STU002,Physical Education,Elective,86
+STU002,Mathematics,Core,70
+STU002,English,Core,81
+STU002,Science,Core,77
+STU002,Music,Elective,69
+STU003,Mathematics,Core,92
+STU003,English,Core,87
+STU003,Science,Core,95
+STU003,Music,Elective,90
+STU003,Art,Elective,84
+STU003,Physical Education,Elective,96
+STU003,Mathematics,Core,89
+STU003,English,Core,93
+STU003,Science,Core,91
+STU003,Music,Elective,86
+STU004,Mathematics,Core,54
+STU004,English,Core,61
+STU004,Science,Core,67
+STU004,Music,Elective,58
+STU004,Art,Elective,73
+STU004,Physical Education,Elective,80
+STU004,Mathematics,Core,63
+STU004,English,Core,69
+STU004,Science,Core,71
+STU004,Music,Elective,60
+STU005,Mathematics,Core,88
+STU005,English,Core,90
+STU005,Science,Core,85
+STU005,Music,Elective,79
+STU005,Art,Elective,92
+STU005,Physical Education,Elective,87
+STU005,Mathematics,Core,94
+STU005,English,Core,83
+STU005,Science,Core,89
+STU005,Music,Elective,91
+STU001,Mathematics,Core,71
+STU001,English,Core,68
+STU001,Science,Core,75
+STU001,Music,Elective,82
+STU001,Art,Elective,77
+STU001,Physical Education,Elective,85
+STU001,Mathematics,Core,73
+STU001,English,Core,79
+STU001,Science,Core,81
+STU001,Music,Elective,74
+STU002,Mathematics,Core,97
+STU002,English,Core,94
+STU002,Science,Core,98
+STU002,Music,Elective,91
+STU002,Art,Elective,89
+STU002,Physical Education,Elective,100
+STU002,Mathematics,Core,96
+STU002,English,Core,92
+STU002,Science,Core,95
+STU002,Music,Elective,93
+STU003,Mathematics,Core,62
+STU003,English,Core,70
+STU003,Science,Core,66
+STU003,Music,Elective,75
+STU003,Art,Elective,68
+STU003,Physical Education,Elective,79
+STU003,Mathematics,Core,64
+STU003,English,Core,73
+STU003,Science,Core,69
+STU003,Music,Elective,71
+STU004,Mathematics,Core,83
+STU004,English,Core,86
+STU004,Science,Core,80
+STU004,Music,Elective,88
+STU004,Art,Elective,85
+STU004,Physical Education,Elective,90
+STU004,Mathematics,Core,87
+STU004,English,Core,82
+STU004,Science,Core,84
+STU004,Music,Elective,89
+STU005,Mathematics,Core,59
+STU005,English,Core,64
+STU005,Science,Core,72
+STU005,Music,Elective,67
+STU005,Art,Elective,76
+STU005,Physical Education,Elective,83
+STU005,Mathematics,Core,61
+STU005,English,Core,70
+STU005,Science,Core,74
+STU005,Music,Elective,69

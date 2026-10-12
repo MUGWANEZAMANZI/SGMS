@@ -9,6 +9,7 @@ import services.StudentApplicationService;
 import services.StudentSearchService;
 import manager.GradeManager;
 import manager.StudentManager;
+import manager.StatisticsCalculator;
 import model.*;
 import report.GradeReport;
 import report.GradeReportService;
@@ -39,7 +40,8 @@ public class Main {
                 gradeService,
                 studentSearchService,
                 new BulkImportService(studentManager, gradeManager),
-                inputReader).start();
+                inputReader,
+                new view.StatisticsView(new StatisticsCalculator(studentManager, gradeManager))).start();
 
     }
 

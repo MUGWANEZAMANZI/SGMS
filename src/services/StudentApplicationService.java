@@ -70,36 +70,10 @@ public class StudentApplicationService {
     }
 
 
-    public void findStudent() {
-        IO.println("\n============= FIND STUDENT =============");
-        String studentId = inputReader.readRequired("Enter the student ID to find: ");
-
-        Student student = studentManager.findStudentById(studentId);
-        if (student == null) {
-            IO.println("Student with ID %s not found.".formatted(studentId));
-            return;
-        }
-
-        IO.println("\nStudent details:");
-        IO.println("ID: " + student.getStudentId());
-        IO.println("Name: " + student.getName());
-        IO.println("Age: " + student.getAge());
-        IO.println("Email: " + student.getEmail());
-        IO.println("Phone: " + student.getPhone());
-        IO.println("Type: " + student.getStudentType());
-        IO.println("Average Grade: %.2f%%".formatted(student.calculateAverageGrade()));
-        IO.println("Status: " + statusText(student));
-    }
-
     private static String statusText(Student student) {
         if (student.getGrades().length == 0) {
             return "No grades";
         }
         return student.isPassing() ? "Passing" : "Failing";
-    }
-
-    public Student search(String searchItem) {
-
-        return studentManager.findStudentById(searchItem);
     }
 }
