@@ -1,5 +1,6 @@
 package model;
 
+import exceptions.InvalidInputException;
 
 public abstract class Subject {
 
@@ -8,10 +9,10 @@ public abstract class Subject {
 
     protected Subject(String subjectName, String subjectCode) {
         if (subjectName == null || subjectName.isBlank()) {
-            throw new IllegalArgumentException("model.Subject name cannot be blank");
+            throw new InvalidInputException("model.Subject name cannot be blank");
         }
         if (subjectCode == null || subjectCode.isBlank()) {
-            throw new IllegalArgumentException("model.Subject code cannot be blank");
+            throw new InvalidInputException("model.Subject code cannot be blank");
         }
         this.subjectName = subjectName.trim();
         this.subjectCode = subjectCode.trim();

@@ -1,5 +1,7 @@
 package report;
 
+import exceptions.StudentNotFoundException;
+import exceptions.InvalidInputException;
 import manager.GradeManager;
 import manager.StudentManager;
 import model.CoreSubject;
@@ -20,12 +22,12 @@ public class GradeReportService {
 
     public GradeReport createReport(String studentId) {
         if (studentId == null || studentId.isBlank()) {
-            throw new IllegalArgumentException("Student ID cannot be blank");
+            throw new InvalidInputException("Student ID cannot be blank");
         }
 
         Student student = studentManager.findStudentById(studentId);
         if (student == null) {
-            throw new IllegalArgumentException("Student not found: " + studentId);
+            throw new StudentNotFoundException(studentId);
         }
 
         Grade[] grades = gradeManager.getGradesByStudent(student.getStudentId());

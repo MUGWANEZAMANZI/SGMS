@@ -1,12 +1,13 @@
 package grading;
 
+import exceptions.InvalidInputException;
 import model.GradePoint;
 
 public class FourPointGradeScale implements GradeScale {
     @Override
     public GradePoint convertPercentageToGPA(double percentage) {
     if(percentage < 0 || percentage > 100) {
-        throw new IllegalArgumentException("Percentage must be between 0 and 100");
+        throw new InvalidInputException("Percentage must be between 0 and 100");
     }
         if (percentage >= 93) {
             return new GradePoint(percentage, 4.0, "A");

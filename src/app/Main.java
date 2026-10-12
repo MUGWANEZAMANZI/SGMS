@@ -15,6 +15,8 @@ import report.GradeReport;
 import report.GradeReportService;
 import report.TextGradeReportExporter;
 import view.Menu;
+import logging.ApplicationLogger;
+import exceptions.FileExportException;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -33,6 +35,7 @@ public class Main {
     private static final GPACalculator gpaCalculator = new GPACalculator();
 
     public static void main(String[] args) {
+        ApplicationLogger.info("Starting Student Grade Management System");
         StudentApplicationService  studentApplicationService =
                 new StudentApplicationService(studentManager, inputReader);
         new Menu(
@@ -157,7 +160,9 @@ public class Main {
             new TextGradeReportExporter().export(report, file);
             IO.println("Report exported to " + file.toAbsolutePath());
         } catch (IOException exception) {
-            throw new IllegalStateException("Could not export report: " + exception.getMessage(), exception);
+            ApplicationLogger.error("Could not export grade report", exception);
+            throw new FileExportException("Could not export report: "
+                    + exception.getMessage(), exception);
         }
     }
 

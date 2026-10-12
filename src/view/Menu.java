@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import view.StatisticsView;
+import logging.ApplicationLogger;
 
 public class Menu {
 
@@ -99,8 +100,10 @@ public class Menu {
                 default -> IO.println("Invalid option.");
             }
         } catch (IllegalArgumentException | IllegalStateException exception) {
+            ApplicationLogger.error("Menu operation failed", exception);
             IO.println("\nInput error: " + exception.getMessage());
         } catch (IOException e) {
+            ApplicationLogger.error("File operation failed", e);
             IO.println("\nCould not import CSV file:: " + e.getMessage());
         }
 

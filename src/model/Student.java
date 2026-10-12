@@ -1,5 +1,7 @@
 package model;
 
+import exceptions.CapacityExceededException;
+import exceptions.InvalidInputException;
 import java.util.Objects;
 
 public abstract class Student {
@@ -71,7 +73,7 @@ public abstract class Student {
 
     public void addGrade(Grade grade) {
         if (gradeCount >= grades.length) {
-            throw new IllegalStateException("model.Grade capacity has been reached");
+            throw new CapacityExceededException("model.Grade capacity has been reached");
         }
         grades[gradeCount++] = Objects.requireNonNull(grade, "model.Grade cannot be null");
     }
@@ -104,14 +106,14 @@ public abstract class Student {
 
     private static String requireNonBlank(String value, String fieldName) {
         if (value == null || value.isBlank()) {
-            throw new IllegalArgumentException(fieldName + " cannot be blank");
+            throw new InvalidInputException(fieldName + " cannot be blank");
         }
         return value.trim();
     }
 
     private static int validateAge(int age) {
         if (age < 1 || age > 120) {
-            throw new IllegalArgumentException("Age must be between 1 and 120");
+            throw new InvalidInputException("Age must be between 1 and 120");
         }
         return age;
     }

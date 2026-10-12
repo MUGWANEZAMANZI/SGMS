@@ -1,5 +1,7 @@
 package manager;
 
+import exceptions.InvalidGradeException;
+import exceptions.CapacityExceededException;
 import model.Grade;
 import model.Student;
 import model.Subject;
@@ -14,14 +16,14 @@ public class GradeManager implements Gradable {
 
     public void addGrade(Grade grade) {
         if (gradeCount >= grades.length) {
-            throw new IllegalStateException("model.Grade capacity has been reached");
+            throw new CapacityExceededException("model.Grade capacity has been reached");
         }
         grades[gradeCount++] = Objects.requireNonNull(grade, "model.Grade cannot be null");
     }
 
     public void recordGrade(Student student, Subject subject, double value) {
         if (!validateGrade(value)) {
-            throw new IllegalArgumentException("model.Grade must be between 0 and 100");
+            throw new InvalidGradeException(value);
         }
         Grade grade = new Grade(student.getStudentId(), subject, value);
         student.addGrade(grade);
