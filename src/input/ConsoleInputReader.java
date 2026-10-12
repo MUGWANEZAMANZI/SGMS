@@ -35,7 +35,7 @@ public class ConsoleInputReader implements InputReader {
     @Override
     public  String readRequired(String prompt) {
         while (true) {
-            String value = IO.readln(prompt);
+            String value = readLine(prompt);
             if (value != null && !value.isBlank()) {
                 return value.trim();
             }
@@ -46,7 +46,7 @@ public class ConsoleInputReader implements InputReader {
     @Override
     public String readEmail(String prompt) {
         while (true) {
-            String value = IO.readln(prompt);
+            String value = readLine(prompt);
             if (value != null && !value.isBlank() ) {
                 if(!value.contains("@")){
                     IO.println("Invalid email format.");
@@ -62,7 +62,7 @@ public class ConsoleInputReader implements InputReader {
     @Override
     public String readName(String prompt) {
         while (true) {
-            String value = IO.readln(prompt);
+            String value = readLine(prompt);
             if (value != null && !value.isBlank()) {
                 String trimmedValue = value.trim();
                 try {
@@ -79,6 +79,10 @@ public class ConsoleInputReader implements InputReader {
 
     @Override
     public void pause(){
-        IO.readln("\nPress Enter to continue...");
+        readLine("\nPress Enter to continue...");
+    }
+
+    protected String readLine(String prompt) {
+        return IO.readln(prompt);
     }
 }
