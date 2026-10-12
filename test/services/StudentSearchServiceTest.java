@@ -1,5 +1,6 @@
 package services;
 
+import input.InputReader;
 import manager.GradeManager;
 import manager.Searchable;
 import manager.StudentManager;
@@ -12,6 +13,9 @@ import org.junit.jupiter.api.Test;
 
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 class StudentSearchServiceTest {
     private Searchable studentSearch;
@@ -95,5 +99,37 @@ class StudentSearchServiceTest {
         gradeManager.recordGrade(student, subject, 75);
         Student[] students = studentManager.findStudentsByAverage(80, 100);
         assertTrue(students.length == 0, "Expected no students to be found with invalid average");
+    }
+
+    @Test
+    void searchDisplaysNoResultsWithoutRequestingAnAction() {
+        Searchable search = mock(Searchable.class);
+        InputReader input = mock(InputReader.class);
+        when(input.readInt("Select search option: ", 1, 4)).thenReturn(1);
+        when(input.readRequired("Enter student ID: ")).thenReturn("STU999");
+
+        new StudentSearchService(search, input).search();
+
+        verify(search).findStudentById("STU999");
+        verify(input, never()).readInt("Select action: ", 1, 4);
+    }
+
+    @Test
+    void searchExportsResultsWhenExportActionIsSelected() throws Exception {
+        Searchable search = mock(Searchable.class);
+        Student student = new RegularStudent(
+                "Export Me", 20, "export@example.com", "0712345678");
+        InputReader input = mock(InputReader.class);
+        when(input.readInt("Select search option: ", 1, 4)).thenReturn(1);
+        when(input.readRequired("Enter student ID: ")).thenReturn(student.getStudentId());
+        when(input.readInt("Select action: ", 1, 4)).thenReturn(2);
+        when(search.findStudentById(student.getStudentId())).thenReturn(student);
+
+        try {
+            new StudentSearchService(search, input).search();
+            assertTrue(Files.exists(Path.of("grade_reports", "search-results.csv")));
+        } finally {
+            Files.deleteIfExists(Path.of("grade_reports", "search-results.csv"));
+        }
     }
 }

@@ -1,5 +1,6 @@
 package grading;
 
+import exceptions.InvalidInputException;
 import model.CoreSubject;
 import model.Grade;
 import org.junit.jupiter.api.Test;
@@ -42,7 +43,13 @@ class GPACalculatorTest {
 
     @Test
     void rejectsPercentageOutsideValidRange() {
-        assertThrows(IllegalArgumentException.class,
+        assertThrows(InvalidInputException.class,
                 () -> calculator.convertPercentageToGPA(101));
+    }
+
+    @Test
+    void acceptsPercentageAtBothRangeBoundaries() {
+        assertEquals("F", calculator.convertPercentageToGPA(0).letterGrade());
+        assertEquals(4.0, calculator.convertPercentageToGPA(100).gpa());
     }
 }
