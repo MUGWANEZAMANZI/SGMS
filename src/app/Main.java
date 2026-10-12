@@ -23,20 +23,49 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 
-public class Main {
+public class Main implements ApplicationActions {
+    private final StudentManager studentManager;
+    private final GradeManager gradeManager;
+    private final InputReader inputReader;
+    private final GradeService gradeService;
+    private final StudentSearchService studentSearchService;
+    private final GPACalculator gpaCalculator;
+    private final GradeReportService reportService;
 
-    private static final StudentManager studentManager = new StudentManager();
-    private static final GradeManager gradeManager = new GradeManager();
-    private static final InputReader inputReader = new ConsoleInputReader();
-    private static final GradeService gradeService =
-            new GradeService(studentManager, gradeManager, inputReader);
-    private static final StudentSearchService studentSearchService =
-            new StudentSearchService(studentManager, inputReader);
-    private static final GPACalculator gpaCalculator = new GPACalculator();
+    public Main(
+            StudentManager studentManager,
+            GradeManager gradeManager,
+            InputReader inputReader,
+            GradeService gradeService,
+            StudentSearchService studentSearchService,
+            GPACalculator gpaCalculator,
+            GradeReportService reportService) {
+        this.studentManager = studentManager;
+        this.gradeManager = gradeManager;
+        this.inputReader = inputReader;
+        this.gradeService = gradeService;
+        this.studentSearchService = studentSearchService;
+        this.gpaCalculator = gpaCalculator;
+        this.reportService = reportService;
+    }
 
     public static void main(String[] args) {
         ApplicationLogger.info("Starting Student Grade Management System");
-        StudentApplicationService  studentApplicationService =
+        createDefault().start();
+    }
+
+    private static Main createDefault() {
+        StudentManager students = new StudentManager();
+        GradeManager grades = new GradeManager();
+        InputReader input = new ConsoleInputReader();
+        GradeService gradeService = new GradeService(students, grades, input);
+        StudentSearchService searchService = new StudentSearchService(students, input);
+        return new Main(students, grades, input, gradeService, searchService,
+                new GPACalculator(), new GradeReportService(students, grades));
+    }
+
+    private void start() {
+        StudentApplicationService studentApplicationService =
                 new StudentApplicationService(studentManager, inputReader);
         new Menu(
                 studentApplicationService,
@@ -44,13 +73,12 @@ public class Main {
                 studentSearchService,
                 new BulkImportService(studentManager, gradeManager),
                 inputReader,
-                new view.StatisticsView(new StatisticsCalculator(studentManager, gradeManager))).start();
-
+                new view.StatisticsView(new StatisticsCalculator(studentManager, gradeManager)),
+                this).start();
     }
 
-
-
-    public static void calculateStudentGPA() {
+    @Override
+    public void calculateStudentGPA() {
         IO.println("\n============= CALCULATE GPA =============");
         String studentId = inputReader.readRequired(
                 "Enter the student ID to calculate GPA: ").toUpperCase();
@@ -86,10 +114,10 @@ public class Main {
     }
 
 
-    public static void viewGradeReport() {
+    @Override
+    public void viewGradeReport() {
         IO.println("\n============= GRADE REPORT =============");
 
-        GradeReportService reportService = new GradeReportService(studentManager, gradeManager);
         String studentId = inputReader.readRequired(
                 "Enter the student ID to view the grade report: ");
         GradeReport report = reportService.createReport(studentId);
@@ -120,7 +148,7 @@ public class Main {
         }
     }
 
-    private static Student findStudent() {
+    private Student findStudent() {
         if (studentManager.getStudentCount() == 0) {
             IO.println("No students have been added yet.");
             return null;
@@ -134,7 +162,7 @@ public class Main {
         return student;
     }
 
-    private static void printStudentSummary(Student student) {
+    private void printStudentSummary(Student student) {
         IO.println("model.Student ID: " + student.getStudentId());
         IO.println("Name: " + student.getName());
         IO.println("Type: " + student.getStudentType());
@@ -145,12 +173,12 @@ public class Main {
 
 
 
-    public static void exportGradeReport() {
+    @Override
+    public void exportGradeReport() {
         IO.println("\n========== EXPORT GRADE REPORT ==========");
 
         String studentId = inputReader.readRequired(
                 "Enter the student ID to export: ");
-        GradeReportService reportService = new GradeReportService(studentManager, gradeManager);
         GradeReport report = reportService.createReport(studentId);
 
         Path directory = Path.of("grade_reports");
@@ -169,18 +197,19 @@ public class Main {
 
 
 
-    public static void pause() {
+    @Override
+    public void pause() {
         inputReader.pause();
     }
 
-    private static String statusText(Student student) {
+    private String statusText(Student student) {
         if (student.getGrades().length == 0) {
             return "No grades";
         }
         return student.isPassing() ? "Passing" : "Failing";
     }
 
-    private static int calculateClassRank(double studentGpa) {
+    private int calculateClassRank(double studentGpa) {
         int rank = 1;
         for (Student student : studentManager.getStudents()) {
             double classGpa = gpaCalculator.calculateCumulativeGPA(
