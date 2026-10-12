@@ -1,0 +1,5 @@
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main", "dev" ] # Ensure your target branch is explicitly included here
