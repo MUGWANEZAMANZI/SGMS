@@ -10,101 +10,52 @@ flowchart TB
     goal([Manage student grades and produce academic reports])
     teacher -->|uses| goal
 
-    goal --> srcRoot
-    goal --> testRoot
+    goal --> srcPath
+    goal --> testPath
 
-    subgraph srcRoot["src/ - application implementation"]
+    subgraph srcPath["SRC PATH - application implementation"]
         direction TB
-        main["app.Main<br/>application entry point"]
-        menu["view.Menu<br/>console navigation"]
-        input["input.ConsoleInputReader<br/>validated input"]
-        studentApp["services.StudentApplicationService<br/>add/view students"]
-        gradeService["services.GradeService<br/>record grades"]
-        searchService["services.StudentSearchService<br/>find and act on results"]
-        bulk["services.BulkImportService<br/>CSV import and summary"]
-        gpa["grading.GPACalculator<br/>percentage to GPA"]
-        statsView["view.StatisticsView<br/>class statistics"]
-        reportService["report.GradeReportService<br/>build reports"]
-        exporter["report.TextGradeReportExporter<br/>write report files"]
-        studentManager["manager.StudentManager<br/>student storage/search"]
-        gradeManager["manager.GradeManager<br/>grade storage/validation"]
-        student["model.Student"]
-        regular["model.RegularStudent"]
-        honors["model.HonorsStudent"]
-        subject["model.Subject"]
-        core["model.CoreSubject"]
-        elective["model.ElectiveSubject"]
-        grade["model.Grade"]
-        exceptions["exceptions/*<br/>domain-specific errors"]
-        logger["logging.ApplicationLogger<br/>timestamped logs"]
+        srcEntry["src/app/Main<br/>application entry point"]
+        srcMenu["src/view/Menu<br/>console navigation"]
+        srcInput["src/input/ConsoleInputReader<br/>validated input"]
+        srcServices["src/services/*<br/>student, grade, search, import"]
+        srcManagers["src/manager/*<br/>storage and statistics"]
+        srcDomain["src/model/*<br/>students, subjects, grades"]
+        srcFeatures["src/grading and report<br/>GPA and exports"]
+        srcSupport["src/exceptions and logging<br/>errors and timestamps"]
 
-        main --> menu
-        main --> studentApp
-        main --> gradeService
-        main --> searchService
-        main --> bulk
-        main --> statsView
-        menu --> input
-        menu --> studentApp
-        menu --> gradeService
-        menu --> searchService
-        menu --> bulk
-        menu --> statsView
-        menu --> mainActions["app.ApplicationActions"]
-        studentApp --> studentManager
-        gradeService --> studentManager
-        gradeService --> gradeManager
-        searchService --> studentManager
-        bulk --> studentManager
-        bulk --> gradeManager
-        statsView --> stats["manager.StatisticsCalculator"]
-        stats --> studentManager
-        stats --> gradeManager
-        reportService --> studentManager
-        reportService --> gradeManager
-        exporter --> report["report.GradeReport"]
-        studentManager --> student
-        gradeManager --> grade
-        student --> regular
-        student --> honors
-        grade --> subject
-        subject --> core
-        subject --> elective
-        studentApp -.-> exceptions
-        gradeService -.-> exceptions
-        bulk -.-> exceptions
-        menu -.-> logger
-        bulk -.-> logger
+        srcEntry --> srcMenu --> srcInput --> srcServices --> srcManagers
+        srcManagers --> srcDomain --> srcFeatures --> srcSupport
+
+        srcMenu -. uses .-> srcServices
+        srcServices -. uses .-> srcManagers
+        srcServices -. creates .-> srcDomain
+        srcFeatures -. reads .-> srcManagers
     end
 
-    subgraph testRoot["test/ - verification and demonstration"]
+    subgraph testPath["TEST PATH - verification and demonstration"]
         direction TB
-        inputTests["input.ConsoleInputReaderTest"]
-        mainTests["app.MainTest"]
-        menuTests["view.MenuTest"]
-        statsTests["view.StatisticsViewTest"]
-        gpaTests["grading.GPACalculatorTest"]
-        statsCalcTests["manager.StatisticsCalculatorTest"]
-        reportTests["report.GradeReportExportTest"]
-        serviceTests["services.MockitoServiceIntegrationTest"]
-        exceptionTests["services.ExceptionPathTest"]
-        statusTests["services.StudentApplicationServiceTest"]
-        importTests["services.BulkImportServiceTest"]
+        testEntry["test/*<br/>JUnit 5 + Mockito"]
+        testInput["input.ConsoleInputReaderTest<br/>input validation"]
+        testApp["app.MainTest and view.MenuTest<br/>entry points and navigation"]
+        testServices["services.MockitoServiceIntegrationTest<br/>mocked service flows"]
+        testFeatures["GPACalculatorTest and StatisticsCalculatorTest<br/>business calculations"]
+        testReports["GradeReportExportTest and StatisticsViewTest<br/>reports and output"]
+        testExceptions["ExceptionPathTest<br/>domain error paths"]
+        testImport["BulkImportServiceTest and StudentApplicationServiceTest<br/>import and student status"]
+        testCoverage["JaCoCo coverage report<br/>target/site/jacoco/index.html"]
 
-        inputTests -. tests .-> input
-        mainTests -. tests .-> main
-        menuTests -. tests .-> menu
-        statsTests -. tests .-> statsView
-        gpaTests -. tests .-> gpa
-        statsCalcTests -. tests .-> stats
-        reportTests -. tests .-> exporter
-        serviceTests -. mocks/tests .-> studentApp
-        serviceTests -. mocks/tests .-> gradeService
-        serviceTests -. mocks/tests .-> searchService
-        serviceTests -. mocks/tests .-> bulk
-        exceptionTests -. tests .-> exceptions
-        statusTests -. tests .-> student
-        importTests -. tests .-> bulk
+        testEntry --> testInput --> testApp --> testServices
+        testServices --> testFeatures --> testReports --> testExceptions
+        testExceptions --> testImport --> testCoverage
+
+        testInput -. verifies .-> srcInput
+        testApp -. verifies .-> srcEntry
+        testServices -. mocks .-> srcServices
+        testFeatures -. verifies .-> srcFeatures
+        testReports -. verifies .-> srcFeatures
+        testExceptions -. verifies .-> srcSupport
+        testImport -. verifies .-> srcServices
     end
 ```
 
