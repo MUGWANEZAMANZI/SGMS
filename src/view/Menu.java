@@ -29,6 +29,7 @@ public class Menu {
     private final StudentSearchService studentSearchService;
     private final StatisticsView statisticsView;
     private final ApplicationActions applicationActions;
+
     public Menu(
             StudentApplicationService studentApplicationService,
             GradeService gradeService,
@@ -37,6 +38,7 @@ public class Menu {
             InputReader inputReader,
             StatisticsView statisticsView,
             ApplicationActions applicationActions) {
+
         this.studentApplicationService = studentApplicationService;
         this.inputReader = inputReader;
         this.bulkImportService = bulkImportService;
