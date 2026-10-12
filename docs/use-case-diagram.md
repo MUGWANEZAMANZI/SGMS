@@ -5,63 +5,107 @@ Academic Administrator is the primary actor and interacts with the console
 application to manage students and grades.
 
 ```mermaid
-flowchart LR
+flowchart TB
     teacher[Teacher / Academic Administrator]
+    goal([Manage student grades and produce academic reports])
+    teacher -->|uses| goal
 
-    subgraph system[model.Student model.Grade Management System]
-        add((Add student))
-        view((View all students))
-        record((Record grade))
-        report((View grade report))
-        validate((Validate input))
-        average((Calculate average and status))
-        ids((Generate student and grade IDs))
-        subjects((Select Core or Elective subject))
+    goal --> srcRoot
+    goal --> testRoot
+
+    subgraph srcRoot["src/ - application implementation"]
+        direction TB
+        main["app.Main<br/>application entry point"]
+        menu["view.Menu<br/>console navigation"]
+        input["input.ConsoleInputReader<br/>validated input"]
+        studentApp["services.StudentApplicationService<br/>add/view students"]
+        gradeService["services.GradeService<br/>record grades"]
+        searchService["services.StudentSearchService<br/>find and act on results"]
+        bulk["services.BulkImportService<br/>CSV import and summary"]
+        gpa["grading.GPACalculator<br/>percentage to GPA"]
+        statsView["view.StatisticsView<br/>class statistics"]
+        reportService["report.GradeReportService<br/>build reports"]
+        exporter["report.TextGradeReportExporter<br/>write report files"]
+        studentManager["manager.StudentManager<br/>student storage/search"]
+        gradeManager["manager.GradeManager<br/>grade storage/validation"]
+        student["model.Student"]
+        regular["model.RegularStudent"]
+        honors["model.HonorsStudent"]
+        subject["model.Subject"]
+        core["model.CoreSubject"]
+        elective["model.ElectiveSubject"]
+        grade["model.Grade"]
+        exceptions["exceptions/*<br/>domain-specific errors"]
+        logger["logging.ApplicationLogger<br/>timestamped logs"]
+
+        main --> menu
+        main --> studentApp
+        main --> gradeService
+        main --> searchService
+        main --> bulk
+        main --> statsView
+        menu --> input
+        menu --> studentApp
+        menu --> gradeService
+        menu --> searchService
+        menu --> bulk
+        menu --> statsView
+        menu --> mainActions["app.ApplicationActions"]
+        studentApp --> studentManager
+        gradeService --> studentManager
+        gradeService --> gradeManager
+        searchService --> studentManager
+        bulk --> studentManager
+        bulk --> gradeManager
+        statsView --> stats["manager.StatisticsCalculator"]
+        stats --> studentManager
+        stats --> gradeManager
+        reportService --> studentManager
+        reportService --> gradeManager
+        exporter --> report["report.GradeReport"]
+        studentManager --> student
+        gradeManager --> grade
+        student --> regular
+        student --> honors
+        grade --> subject
+        subject --> core
+        subject --> elective
+        studentApp -.-> exceptions
+        gradeService -.-> exceptions
+        bulk -.-> exceptions
+        menu -.-> logger
+        bulk -.-> logger
     end
 
-    subgraph classes[Implemented Java classes and types]
-        main[Main]
-        menu[Menu]
-        student[model.Student]
-        regular[model.RegularStudent]
-        honors[model.HonorsStudent]
-        subject[model.Subject]
-        core[model.CoreSubject]
-        elective[model.ElectiveSubject]
-        grade[model.Grade]
-        studentManager[manager.StudentManager]
-        gradeManager[manager.GradeManager]
-        gradable[manager.Gradable]
-        viewHelper[StudentView]
+    subgraph testRoot["test/ - verification and demonstration"]
+        direction TB
+        inputTests["input.ConsoleInputReaderTest"]
+        mainTests["app.MainTest"]
+        menuTests["view.MenuTest"]
+        statsTests["view.StatisticsViewTest"]
+        gpaTests["grading.GPACalculatorTest"]
+        statsCalcTests["manager.StatisticsCalculatorTest"]
+        reportTests["report.GradeReportExportTest"]
+        serviceTests["services.MockitoServiceIntegrationTest"]
+        exceptionTests["services.ExceptionPathTest"]
+        statusTests["services.StudentApplicationServiceTest"]
+        importTests["services.BulkImportServiceTest"]
+
+        inputTests -. tests .-> input
+        mainTests -. tests .-> main
+        menuTests -. tests .-> menu
+        statsTests -. tests .-> statsView
+        gpaTests -. tests .-> gpa
+        statsCalcTests -. tests .-> stats
+        reportTests -. tests .-> exporter
+        serviceTests -. mocks/tests .-> studentApp
+        serviceTests -. mocks/tests .-> gradeService
+        serviceTests -. mocks/tests .-> searchService
+        serviceTests -. mocks/tests .-> bulk
+        exceptionTests -. tests .-> exceptions
+        statusTests -. tests .-> student
+        importTests -. tests .-> bulk
     end
-
-    teacher --> add
-    teacher --> view
-    teacher --> record
-    teacher --> report
-
-    add -. includes .-> validate
-    add -. includes .-> ids
-    record -. includes .-> validate
-    record -. includes .-> subjects
-    record -. includes .-> ids
-    view -. includes .-> average
-    report -. includes .-> average
-
-    menu -. starts .-> main
-    main -. coordinates .-> add
-    main -. coordinates .-> view
-    main -. coordinates .-> record
-    main -. coordinates .-> report
-    student -. specialized by .-> regular
-    student -. specialized by .-> honors
-    subject -. specialized by .-> core
-    subject -. specialized by .-> elective
-    studentManager -. manages .-> student
-    gradeManager -. manages .-> grade
-    gradeManager -. implements .-> gradable
-    grade -. references .-> subject
-    viewHelper -. displays .-> student
 ```
 
 ## Actors and use cases
