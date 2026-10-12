@@ -21,18 +21,5 @@ jobs:
           distribution: temurin
           java-version: '25'
 
-      - name: Run JUnit tests
-        shell: bash
-        run: |
-          set -euo pipefail
-          mkdir -p out test-out
-          curl --fail --silent --show-error --location \
-            --output junit-platform-console-standalone.jar \
-            https://repo1.maven.org/maven2/org/junit/platform/junit-platform-console-standalone/1.14.0/junit-platform-console-standalone-1.14.0.jar
-          javac -d out $(find src -name '*.java')
-          javac -cp "out:junit-platform-console-standalone.jar" \
-            -d test-out $(find test -name '*.java')
-          java -jar junit-platform-console-standalone.jar \
-            execute \
-            --class-path "out:test-out" \
-            --scan-class-path
+      - name: Run JUnit and Mockito tests
+        run: mvn --batch-mode test
