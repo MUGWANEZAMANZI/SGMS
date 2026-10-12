@@ -4,6 +4,9 @@ import exceptions.InvalidGradeException;
 import exceptions.InvalidInputException;
 import org.junit.jupiter.api.Test;
 
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class GradeAndSubjectTest {
@@ -47,6 +50,25 @@ class GradeAndSubjectTest {
         assertEquals("STU001", grade.getStudentId());
         assertEquals(75.5, grade.getValue());
         assertEquals(grade.getRecordedAt().toString(), grade.formattedDate());
-        assertDoesNotThrow(grade::displayGradeDetails);
+
+        // Capturing the output of displayGradeDetails for testing
+        ByteArrayOutputStream output = new ByteArrayOutputStream();
+        PrintStream original = System.out;
+
+        try {
+            System.setOut(new PrintStream(output));
+
+            grade.displayGradeDetails();
+
+            String text = output.toString();
+            assertTrue(text.contains("Math"));
+            assertTrue(text.contains("75.50%"));
+            assertTrue(text.contains("Core"));
+        } finally {
+            System.setOut(original);
+        }
     }
+
+
+
 }

@@ -40,6 +40,7 @@ public class Main implements ApplicationActions {
             StudentSearchService studentSearchService,
             GPACalculator gpaCalculator,
             GradeReportService reportService) {
+
         this.studentManager = studentManager;
         this.gradeManager = gradeManager;
         this.inputReader = inputReader;
@@ -49,7 +50,7 @@ public class Main implements ApplicationActions {
         this.reportService = reportService;
     }
 
-    public static void main(String[] args) {
+    static void main(String[] args) {
         ApplicationLogger.info("Starting Student Grade Management System");
         createDefault().start();
     }
