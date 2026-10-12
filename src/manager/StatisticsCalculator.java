@@ -8,15 +8,29 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+/**
+ * Calculates statistics from managed students and grades.
+ */
 public class StatisticsCalculator {
     private final StudentManager studentManager;
     private final GradeManager gradeManager;
 
+    /**
+     * Creates a calculator backed by the supplied managers.
+     *
+     * @param studentManager source of students
+     * @param gradeManager source of grades
+     */
     public StatisticsCalculator(StudentManager studentManager, GradeManager gradeManager) {
         this.studentManager = studentManager;
         this.gradeManager = gradeManager;
     }
 
+    /**
+     * Calculates current class statistics.
+     *
+     * @return the calculated statistics
+     */
     public StatisticsResult calculate() {
         Student[] students = studentManager.getStudents();
         Grade[] grades = gradeManager.getGrades();

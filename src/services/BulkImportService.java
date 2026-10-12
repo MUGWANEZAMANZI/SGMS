@@ -18,15 +18,31 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Imports grades from CSV files into student and grade managers.
+ */
 public class BulkImportService implements CSVParser {
     private final StudentManager studentManager;
     private final GradeManager gradeManager;
 
+    /**
+     * Creates an import service with the supplied managers.
+     *
+     * @param studentManager manager used to find students
+     * @param gradeManager manager used to record grades
+     */
     public BulkImportService(StudentManager studentManager, GradeManager gradeManager) {
         this.studentManager = studentManager;
         this.gradeManager = gradeManager;
     }
 
+    /**
+     * Imports grades from a CSV file and writes a failure log.
+     *
+     * @param filePath path to the CSV file
+     * @return a summary of imported and failed rows
+     * @throws IOException if the input file or failure log cannot be accessed
+     */
     @Override
     public ImportSummary importCSV(String filePath) throws IOException {
         List<String> failures = new ArrayList<>();

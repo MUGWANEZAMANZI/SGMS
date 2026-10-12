@@ -19,6 +19,9 @@ import exceptions.InvalidGradeException;
 import exceptions.InvalidInputException;
 import exceptions.StudentNotFoundException;
 
+/**
+ * Presents the application's interactive main menu.
+ */
 public class Menu {
 
     private final Map<Integer, String> options = new LinkedHashMap<>();
@@ -30,6 +33,17 @@ public class Menu {
     private final StatisticsView statisticsView;
     private final ApplicationActions applicationActions;
 
+    /**
+     * Creates a menu with its application services and actions.
+     *
+     * @param studentApplicationService handles student operations
+     * @param gradeService handles grade operations
+     * @param studentSearchService handles student searches
+     * @param bulkImportService handles CSV imports
+     * @param inputReader reads menu input
+     * @param statisticsView displays statistics
+     * @param applicationActions handles report and GPA actions
+     */
     public Menu(
             StudentApplicationService studentApplicationService,
             GradeService gradeService,
@@ -61,6 +75,7 @@ public class Menu {
         options.put(10, "Exit");
     }
 
+    /** Starts the interactive menu loop. */
     public void start() {
         showHeader();
 
@@ -90,6 +105,12 @@ public class Menu {
         IO.println("---------------------------------------------");
     }
 
+    /**
+     * Handles a selected menu option.
+     *
+     * @param option selected option number
+     * @return {@code false} when the user selects exit; otherwise {@code true}
+     */
     public boolean handleOptions(int option)
     {
         try {

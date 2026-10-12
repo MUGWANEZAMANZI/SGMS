@@ -6,13 +6,22 @@ import model.Grade;
 
 import java.util.Map;
 
+/**
+ * Displays calculated class statistics.
+ */
 public class StatisticsView {
     private final StatisticsCalculator statisticsCalculator;
 
+    /**
+     * Creates a statistics view.
+     *
+     * @param statisticsCalculator calculator used to obtain statistics
+     */
     public StatisticsView(StatisticsCalculator statisticsCalculator) {
         this.statisticsCalculator = statisticsCalculator;
     }
 
+    /** Calculates and displays the current class statistics. */
     public void displayStatistics() {
         StatisticsResult statistics = statisticsCalculator.calculate();
 
