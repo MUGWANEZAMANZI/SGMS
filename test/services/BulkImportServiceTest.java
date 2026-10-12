@@ -10,6 +10,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class BulkImportServiceTest {
 
@@ -35,8 +36,35 @@ class BulkImportServiceTest {
                 new BulkImportService(studentManager, gradeManager);
 
         try {
-            service.importCSV(csvFile.toString());
+            assertEquals(100, service.importCSV(csvFile.toString()).importedRows());
             assertEquals(100, gradeManager.getGradeCount());
+        } finally {
+            Files.deleteIfExists(csvFile);
+        }
+    }
+
+    @Test
+    void summarizesMalformedMissingAndUnknownRows() throws Exception {
+        StudentManager studentManager = new StudentManager();
+        GradeManager gradeManager = new GradeManager();
+        Student student = addStudents(studentManager, 1)[0];
+        Path csvFile = Files.createTempFile("invalid-grades-", ".csv");
+        Files.writeString(csvFile,
+                "studentId,subject,type,grade\n"
+                        + student.getStudentId() + ",Math,Core,not-a-number\n"
+                        + "STU999,Math,Core,80\n"
+                        + "bad,row\n"
+                        + student.getStudentId() + ",Art,Elective,70\n"
+                        + student.getStudentId() + ",Math,Other,80\n");
+
+        try {
+            ImportSummary summary = new BulkImportService(studentManager, gradeManager)
+                    .importCSV(csvFile.toString());
+            assertEquals(5, summary.totalRows());
+            assertEquals(1, summary.importedRows());
+            assertEquals(4, summary.failedRows());
+            assertTrue(Files.exists(Path.of(summary.logFile())));
+            assertEquals(1, gradeManager.getGradeCount());
         } finally {
             Files.deleteIfExists(csvFile);
         }
