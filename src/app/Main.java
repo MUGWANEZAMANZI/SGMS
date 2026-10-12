@@ -23,6 +23,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 
+/**
+ * Coordinates the application's services and menu actions.
+ */
 public class Main implements ApplicationActions {
     private final StudentManager studentManager;
     private final GradeManager gradeManager;
@@ -32,6 +35,17 @@ public class Main implements ApplicationActions {
     private final GPACalculator gpaCalculator;
     private final GradeReportService reportService;
 
+    /**
+     * Creates an application coordinator with its required services.
+     *
+     * @param studentManager manages students
+     * @param gradeManager manages grades
+     * @param inputReader reads user input
+     * @param gradeService handles grade operations
+     * @param studentSearchService searches for students
+     * @param gpaCalculator calculates GPA values
+     * @param reportService creates grade reports
+     */
     public Main(
             StudentManager studentManager,
             GradeManager gradeManager,
@@ -50,6 +64,11 @@ public class Main implements ApplicationActions {
         this.reportService = reportService;
     }
 
+    /**
+     * The main entry point of the application.
+     *
+     * @param args command-line arguments (not used)
+     */
     static void main(String[] args) {
         ApplicationLogger.info("Starting Student Grade Management System");
         createDefault().start();
@@ -78,6 +97,7 @@ public class Main implements ApplicationActions {
                 this).start();
     }
 
+    /** Calculates and displays the selected student's GPA and class rank. */
     @Override
     public void calculateStudentGPA() {
         IO.println("\n============= CALCULATE GPA =============");
@@ -115,6 +135,7 @@ public class Main implements ApplicationActions {
     }
 
 
+    /** Creates and displays the selected student's grade report. */
     @Override
     public void viewGradeReport() {
         IO.println("\n============= GRADE REPORT =============");
@@ -174,6 +195,7 @@ public class Main implements ApplicationActions {
 
 
 
+    /** Creates and exports the selected student's grade report. */
     @Override
     public void exportGradeReport() {
         IO.println("\n========== EXPORT GRADE REPORT ==========");
@@ -198,6 +220,7 @@ public class Main implements ApplicationActions {
 
 
 
+    /** Pauses until the input reader receives confirmation. */
     @Override
     public void pause() {
         inputReader.pause();

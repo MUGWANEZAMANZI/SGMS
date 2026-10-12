@@ -7,11 +7,21 @@ import model.*;
 
 import java.util.Objects;
 
+/**
+ * Provides interactive grade-recording operations.
+ */
 public class GradeService {
     private final StudentManager studentManager;
     private final GradeManager gradeManager;
     private final InputReader inputReader;
 
+    /**
+     * Creates a grade service.
+     *
+     * @param studentManager manager used to find students
+     * @param gradeManager manager used to record grades
+     * @param inputReader reader used for interactive input
+     */
     public GradeService(StudentManager studentManager, GradeManager gradeManager, InputReader inputReader
     ) {
         this.studentManager = Objects.requireNonNull(studentManager);
@@ -19,6 +29,7 @@ public class GradeService {
         this.inputReader = Objects.requireNonNull(inputReader);
     }
 
+    /** Interactively records a grade for a student. */
      public void recordGrade() {
         IO.println("\n============= RECORD GRADE =============");
         String studentId = inputReader.readRequired("Enter the student ID to record a grade: ");
@@ -51,6 +62,12 @@ public class GradeService {
         }
     }
 
+    /**
+     * Prompts for and creates a subject of the selected type.
+     *
+     * @param subjectTypeChoice {@code 1} for core or another value for elective
+     * @return the selected subject
+     */
     public Subject chooseSubject(int subjectTypeChoice) {
         String[] names;
         if (subjectTypeChoice == 1) {

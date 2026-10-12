@@ -2,6 +2,9 @@ package model;
 
 import exceptions.InvalidInputException;
 
+/**
+ * Base class for subjects that can receive grades.
+ */
 public abstract class Subject {
 
     private final String subjectName;
@@ -19,15 +22,31 @@ public abstract class Subject {
 
 
     }
+    /**
+     * Returns the subject name.
+     *
+     * @return the subject name
+     */
     public String getSubjectName() {
         return subjectName;
     }
 
+    /**
+     * Returns the subject code.
+     *
+     * @return the subject code
+     */
     public String getSubjectCode() {
         return subjectCode;
     }
 
+    /**
+     * Returns the subject category.
+     *
+     * @return the subject category
+     */
     public abstract String getSubjectType();
 
+    /** Displays the subject details. */
     public abstract void displaySubjectDetails();
 }

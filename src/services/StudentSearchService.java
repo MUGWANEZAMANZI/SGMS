@@ -13,10 +13,19 @@ import exceptions.InvalidInputException;
 
 import java.util.Objects;
 
+/**
+ * Provides interactive student searching and result export.
+ */
 public final class StudentSearchService {
     private final Searchable studentSearch;
     private final InputReader inputReader;
 
+    /**
+     * Creates a student search service.
+     *
+     * @param studentSearch search implementation to use
+     * @param inputReader reader used for interactive input
+     */
     public StudentSearchService(Searchable studentSearch, InputReader inputReader) {
         this.studentSearch = Objects.requireNonNull(
                 studentSearch, "Student search cannot be null");
@@ -24,6 +33,7 @@ public final class StudentSearchService {
                 inputReader, "Input reader cannot be null");
     }
 
+    /** Interactively searches for students and presents the results. */
     public void search() {
         IO.println("\n============= SEARCH STUDENTS =============");
         IO.println("1. By Student ID");

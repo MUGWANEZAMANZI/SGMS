@@ -8,15 +8,25 @@ import model.Student;
 
 import java.util.Objects;
 
+/**
+ * Provides interactive student-management operations.
+ */
 public class StudentApplicationService {
     private final StudentManager studentManager;
     private final InputReader inputReader;
 
+    /**
+     * Creates a student application service.
+     *
+     * @param studentManager manager used to store students
+     * @param inputReader reader used for interactive input
+     */
     public StudentApplicationService(StudentManager studentManager, InputReader inputReader) {
         this.studentManager = Objects.requireNonNull(studentManager);
         this.inputReader = Objects.requireNonNull(inputReader);
     }
 
+    /** Interactively creates and adds a student. */
     public void addStudent() {
         IO.println("\n============= ADD STUDENT =============");
 
@@ -40,6 +50,7 @@ public class StudentApplicationService {
         IO.println("Student added successfully!");
     }
 
+    /** Displays all stored students and their summaries. */
     public void viewStudents() {
         IO.println("\n=============== STUDENTS ===============");
 

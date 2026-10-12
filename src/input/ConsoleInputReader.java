@@ -1,7 +1,18 @@
 package input;
 
+/**
+ * Reads validated values from the console.
+ */
 public class ConsoleInputReader implements InputReader {
 
+    /**
+     * Reads an integer within an inclusive range.
+     *
+     * @param prompt prompt shown to the user
+     * @param minimum minimum accepted value
+     * @param maximum maximum accepted value
+     * @return the entered integer
+     */
     @Override
     public  int readInt(String prompt, int minimum, int maximum) {
         while (true) {
@@ -17,6 +28,14 @@ public class ConsoleInputReader implements InputReader {
         }
     }
 
+    /**
+     * Reads a decimal number within an inclusive range.
+     *
+     * @param prompt prompt shown to the user
+     * @param minimum minimum accepted value
+     * @param maximum maximum accepted value
+     * @return the entered number
+     */
     @Override
     public double readDouble(String prompt, double minimum, double maximum) {
         while (true) {
@@ -32,6 +51,12 @@ public class ConsoleInputReader implements InputReader {
         }
     }
 
+    /**
+     * Reads a non-blank value.
+     *
+     * @param prompt prompt shown to the user
+     * @return the entered value
+     */
     @Override
     public  String readRequired(String prompt) {
         while (true) {
@@ -43,6 +68,12 @@ public class ConsoleInputReader implements InputReader {
         }
     }
 
+    /**
+     * Reads an email address containing an at sign.
+     *
+     * @param prompt prompt shown to the user
+     * @return the entered email address
+     */
     @Override
     public String readEmail(String prompt) {
         while (true) {
@@ -59,6 +90,12 @@ public class ConsoleInputReader implements InputReader {
         }
     }
 
+    /**
+     * Reads a non-numeric name.
+     *
+     * @param prompt prompt shown to the user
+     * @return the entered name
+     */
     @Override
     public String readName(String prompt) {
         while (true) {
@@ -77,6 +114,7 @@ public class ConsoleInputReader implements InputReader {
         }
     }
 
+    /** Waits for the user to press Enter. */
     @Override
     public void pause(){
         readLine("\nPress Enter to continue...");
