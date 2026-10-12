@@ -1,5 +1,6 @@
 package manager;
 
+import exceptions.CapacityExceededException;
 import model.Student;
 
 import java.util.Arrays;
@@ -11,7 +12,7 @@ public class StudentManager implements Searchable {
 
     public void addStudent(Student student) {
         if (studentCount >= students.length) {
-            throw new IllegalStateException("model.Student capacity has been reached");
+            throw new CapacityExceededException("model.Student capacity has been reached");
         }
         students[studentCount++] = java.util.Objects.requireNonNull(
                 student, "model.Student cannot be null");
@@ -24,7 +25,7 @@ public class StudentManager implements Searchable {
                 return students[index];
             }
         }
-        return null;
+            return null;
     }
 
     @Override

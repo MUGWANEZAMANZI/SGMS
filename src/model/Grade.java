@@ -1,5 +1,7 @@
 package model;
 
+import exceptions.InvalidGradeException;
+import exceptions.InvalidInputException;
 import java.time.LocalDate;
 import java.util.Objects;
 
@@ -15,10 +17,10 @@ public class Grade {
 
     public Grade(String studentId, Subject subject, double value) {
         if (studentId == null || studentId.isBlank()) {
-            throw new IllegalArgumentException("model.Student ID cannot be blank");
+            throw new InvalidInputException("model.Student ID cannot be blank");
         }
         if (value < 0 || value > 100) {
-            throw new IllegalArgumentException("model.Grade must be between 0 and 100");
+            throw new InvalidGradeException(value);
         }
 
         this.gradeId = "GRD%03d".formatted(nextGradeNumber++);

@@ -2,6 +2,9 @@ package services;
 
 import manager.GradeManager;
 import manager.StudentManager;
+import exceptions.ImportFormatException;
+import exceptions.StudentNotFoundException;
+import logging.ApplicationLogger;
 import model.CoreSubject;
 import model.ElectiveSubject;
 import model.Student;
@@ -10,6 +13,10 @@ import model.Subject;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 
 public class BulkImportService implements CSVParser {
     private final StudentManager studentManager;
@@ -21,25 +28,27 @@ public class BulkImportService implements CSVParser {
     }
 
     @Override
-    public void importCSV(String filePath) throws IOException {
+    public ImportSummary importCSV(String filePath) throws IOException {
+        List<String> failures = new ArrayList<>();
+        int total = 0;
+        int imported = 0;
         try (var lines = Files.lines(Path.of(filePath))) {
             int rowNumber = 0;
-            int imported = 0;
-            int failed = 0;
             for (String line : (Iterable<String>) lines::iterator) {
                 rowNumber++;
                 if (rowNumber == 1 && line.toLowerCase().startsWith("studentid")) {
                     continue;
                 }
+                total++;
                 String[] fields = line.split(COMMA_DELIMITER, -1);
                 if (fields.length != 4) {
-                    failed++;
+                    failures.add("Row " + rowNumber + ": expected 4 columns");
                     continue;
                 }
                 try {
                     Student student = studentManager.findStudentById(fields[0].trim());
                     if (student == null) {
-                        throw new IllegalArgumentException("Student not found");
+                        throw new StudentNotFoundException(fields[0].trim());
                     }
                     String type = fields[2].trim();
                     Subject subject = type.equalsIgnoreCase("Core")
@@ -48,17 +57,28 @@ public class BulkImportService implements CSVParser {
                             ? new ElectiveSubject(fields[1].trim(), "IMPORT-ELECTIVE-" + rowNumber)
                             : null;
                     if (subject == null) {
-                        throw new IllegalArgumentException("Invalid subject type");
+                        throw new ImportFormatException(
+                                "Row " + rowNumber + ": invalid subject type");
                     }
                     double value = Double.parseDouble(fields[3].trim());
                     gradeManager.recordGrade(student, subject, value);
                     imported++;
-                } catch (IllegalArgumentException exception) {
-                    failed++;
+                } catch (StudentNotFoundException | ImportFormatException
+                         | NumberFormatException exception) {
+                    failures.add("Row " + rowNumber + ": " + exception.getMessage());
                 }
             }
-            IO.println("Imported grades: " + imported);
-            IO.println("Failed rows: " + failed);
         }
+        Path logPath = Path.of("imports", "import_log_"
+                + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"))
+                + ".txt");
+        Files.createDirectories(logPath.getParent());
+        Files.write(logPath, failures);
+        ImportSummary summary = new ImportSummary(total, imported, failures.size(), logPath.toString());
+        IO.println("Import summary: " + summary.importedRows() + " imported, "
+                + summary.failedRows() + " failed of " + summary.totalRows());
+        IO.println("Import log: " + summary.logFile());
+        ApplicationLogger.info("CSV import completed: " + summary);
+        return summary;
     }
 }
