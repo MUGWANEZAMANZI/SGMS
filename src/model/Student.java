@@ -149,7 +149,7 @@ public abstract class Student {
      * @throws CapacityExceededException if the grade capacity has been reached
      * @throws NullPointerException if {@code grade} is {@code null}
      */
-    public void addGrade(Grade grade) {
+    public synchronized void addGrade(Grade grade) {
         if (gradeCount >= grades.length) {
             throw new CapacityExceededException("model.Grade capacity has been reached");
         }
@@ -161,7 +161,7 @@ public abstract class Student {
      *
      * @return a copy of the recorded grades
      */
-    public Grade[] getGrades() {
+    public synchronized Grade[] getGrades() {
         return java.util.Arrays.copyOf(grades, gradeCount);
     }
 
@@ -170,7 +170,7 @@ public abstract class Student {
      *
      * @return the average grade, or {@code 0.0} if no grades are recorded
      */
-    public double calculateAverageGrade() {
+    public synchronized double calculateAverageGrade() {
         if (gradeCount == 0) {
             return 0.0;
         }
@@ -187,7 +187,7 @@ public abstract class Student {
      *
      * @return {@code true} when the student has grades and meets the threshold
      */
-    public boolean isPassing() {
+    public synchronized boolean isPassing() {
         return gradeCount > 0 && calculateAverageGrade() >= getPassingGrade();
     }
 

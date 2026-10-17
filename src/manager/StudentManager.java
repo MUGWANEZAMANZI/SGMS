@@ -21,7 +21,7 @@ public class StudentManager implements Searchable {
      * @param student student to add
      * @throws NullPointerException if {@code student} is {@code null}
      */
-    public void addStudent(Student student) {
+    public synchronized void addStudent(Student student) {
         Student value = Objects.requireNonNull(student, "Student cannot be null");
         students.put(value.getStudentId().toUpperCase(Locale.ROOT), value);
     }
@@ -33,7 +33,7 @@ public class StudentManager implements Searchable {
      * @return the matching student, or {@code null} when absent
      */
     @Override
-    public Student findStudentById(String studentId) {
+    public synchronized Student findStudentById(String studentId) {
         if (studentId == null || studentId.isBlank()) {
             return null;
         }
@@ -47,7 +47,7 @@ public class StudentManager implements Searchable {
      * @return matching students
      */
     @Override
-    public Student[] findStudentsByName(String name) {
+    public synchronized Student[] findStudentsByName(String name) {
         if (name == null || name.isBlank()) {
             return new Student[0];
         }
@@ -69,7 +69,7 @@ public class StudentManager implements Searchable {
      * @return matching students
      */
     @Override
-    public Student[] findStudentsByAverage(double minimum, double maximum) {
+    public synchronized Student[] findStudentsByAverage(double minimum, double maximum) {
         List<Student> matches = new ArrayList<>();
         for (Student student : students.values()) {
             double average = student.calculateAverageGrade();
@@ -87,7 +87,7 @@ public class StudentManager implements Searchable {
      * @return matching students
      */
     @Override
-    public Student[] findStudentsByType(String studentType) {
+    public synchronized Student[] findStudentsByType(String studentType) {
         if (studentType == null || studentType.isBlank()) {
             return new Student[0];
         }
@@ -106,7 +106,7 @@ public class StudentManager implements Searchable {
      *
      * @return a copy of the stored students
      */
-    public Student[] getStudents() {
+    public synchronized Student[] getStudents() {
         return students.values().toArray(new Student[0]);
     }
 
@@ -115,7 +115,7 @@ public class StudentManager implements Searchable {
      *
      * @return the student count
      */
-    public int getStudentCount() {
+    public synchronized int getStudentCount() {
         return students.size();
     }
 }
