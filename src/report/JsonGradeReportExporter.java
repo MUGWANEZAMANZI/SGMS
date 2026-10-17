@@ -6,7 +6,7 @@ import java.nio.file.Path;
 /**
  * Exports grade reports in CSV format.
  */
-public class JsonGradeReportExporter implements GradeReportExporter {
+public final class JsonGradeReportExporter implements GradeReportExporter {
 
     /**
      * Exports a report to a CSV file.
@@ -17,6 +17,6 @@ public class JsonGradeReportExporter implements GradeReportExporter {
      */
     @Override
     public void export(GradeReport report, Path file) throws IOException {
-
+        java.nio.file.Files.writeString(file, report.generateJsonReport());
     }
 }

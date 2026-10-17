@@ -5,6 +5,7 @@ import exceptions.InvalidInputException;
 
 import java.util.HashSet;
 import java.util.Objects;
+import validation.ValidationPatterns;
 
 /**
  * Base class for students and their recorded grades.
@@ -31,8 +32,8 @@ public abstract class Student {
         this.studentId = "STU%03d".formatted(nextStudentNumber++);
         this.name = requireNonBlank(name, "Name");
         this.age = validateAge(age);
-        this.email = requireNonBlank(email, "Email");
-        this.phone = requireNonBlank(phone, "Phone");
+        this.email = ValidationPatterns.requireEmail(email);
+        this.phone = ValidationPatterns.requirePhone(phone);
         this.status = Status.ACTIVE;
         this.subjects = new HashSet<>(Objects.requireNonNull(subjects, "Subjects cannot be null"));
     }
@@ -100,7 +101,7 @@ public abstract class Student {
      * @throws InvalidInputException if {@code email} is blank
      */
     public void setEmail(String email) {
-        this.email = requireNonBlank(email, "Email");
+        this.email = ValidationPatterns.requireEmail(email);
     }
 
     /**
@@ -119,7 +120,7 @@ public abstract class Student {
      * @throws InvalidInputException if {@code phone} is blank
      */
     public void setPhone(String phone) {
-        this.phone = requireNonBlank(phone, "Phone");
+        this.phone = ValidationPatterns.requirePhone(phone);
     }
 
     /**

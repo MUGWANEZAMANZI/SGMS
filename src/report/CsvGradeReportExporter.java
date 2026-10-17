@@ -3,6 +3,7 @@ package report;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.charset.StandardCharsets;
 
 /**
  * Exports grade reports in CSV format.
@@ -19,6 +20,6 @@ public class CsvGradeReportExporter implements GradeReportExporter {
     @Override
     public void export(GradeReport report, Path file) throws IOException {
         String rawCsv = report.generateCsvReport();
-        Files.write(file, rawCsv.getBytes());
+        Files.writeString(file, rawCsv, StandardCharsets.UTF_8);
     }
 }

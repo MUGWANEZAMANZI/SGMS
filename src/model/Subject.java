@@ -1,6 +1,7 @@
 package model;
 
 import exceptions.InvalidInputException;
+import validation.ValidationPatterns;
 
 /**
  * Base class for subjects that can receive grades.
@@ -14,11 +15,8 @@ public abstract class Subject {
         if (subjectName == null || subjectName.isBlank()) {
             throw new InvalidInputException("model.Subject name cannot be blank");
         }
-        if (subjectCode == null || subjectCode.isBlank()) {
-            throw new InvalidInputException("model.Subject code cannot be blank");
-        }
         this.subjectName = subjectName.trim();
-        this.subjectCode = subjectCode.trim();
+        this.subjectCode = ValidationPatterns.requireCourseCode(subjectCode);
 
 
     }

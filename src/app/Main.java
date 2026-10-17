@@ -12,6 +12,7 @@ import report.GradeReport;
 import report.GradeReportService;
 import report.TextGradeReportExporter;
 import report.StudentImportService;
+import report.GradeReportFileService;
 import view.Menu;
 import view.GPAView;
 import logging.ApplicationLogger;
@@ -33,6 +34,7 @@ public class Main implements ApplicationActions {
     private final StudentSearchService studentSearchService;
     private final GPAView gpaView;
     private final GradeReportService reportService;
+    private final GradeReportFileService reportFileService;
 
     /**
      * Creates an application coordinator with its required services.
@@ -64,6 +66,7 @@ public class Main implements ApplicationActions {
                 inputReader,
                 new RankingService(gradeManager, gpaCalculator));
         this.reportService = reportService;
+        this.reportFileService = new GradeReportFileService();
     }
 
     /**
@@ -180,7 +183,7 @@ public class Main implements ApplicationActions {
         Path file = directory.resolve(studentId.toUpperCase() + "_report.txt");
         try {
             Files.createDirectories(directory);
-            new TextGradeReportExporter().export(report, file);
+            reportFileService.export(report, file);
             IO.println("Report exported to " + file.toAbsolutePath());
         } catch (IOException exception) {
             ApplicationLogger.error("Could not export grade report", exception);
