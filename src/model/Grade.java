@@ -1,9 +1,9 @@
 package model;
 
 import exceptions.InvalidGradeException;
-import exceptions.InvalidInputException;
 import java.time.LocalDate;
 import java.util.Objects;
+import validation.ValidationPatterns;
 
 /**
  * Represents a percentage grade recorded for a student and subject.
@@ -29,18 +29,29 @@ public class Grade {
      * @throws NullPointerException if {@code subject} is {@code null}
      */
     public Grade(String studentId, Subject subject, double value) {
-        if (studentId == null || studentId.isBlank()) {
-            throw new InvalidInputException("model.Student ID cannot be blank");
-        }
+        this(studentId, subject, value, LocalDate.now());
+    }
+
+    /**
+     * Creates a grade with a supplied ISO-valid recording date.
+     *
+     * @param studentId identifier of the student
+     * @param subject subject receiving the grade
+     * @param value percentage value from 0 through 100
+     * @param recordedAt recording date
+     */
+    public Grade(String studentId, Subject subject, double value, LocalDate recordedAt) {
+        String normalizedStudentId = ValidationPatterns.requireStudentId(studentId);
         if (value < 0 || value > 100) {
             throw new InvalidGradeException(value);
         }
 
         this.gradeId = "GRD%03d".formatted(nextGradeNumber++);
-        this.studentId = studentId;
+        this.studentId = normalizedStudentId;
         this.subject = Objects.requireNonNull(subject, "model.Subject cannot be null");
         this.value = value;
-        this.recordedAt = LocalDate.now();
+        this.recordedAt = Objects.requireNonNull(recordedAt, "Recorded date cannot be null");
+        ValidationPatterns.requireIsoDate(this.recordedAt.toString());
     }
 
     /**
