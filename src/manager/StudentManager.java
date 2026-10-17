@@ -1,31 +1,29 @@
 package manager;
 
-import exceptions.CapacityExceededException;
 import model.Student;
 
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Objects;
 
 /**
  * Stores and searches students.
  */
 public class StudentManager implements Searchable {
 
-    private final Student[] students = new Student[50]; //In case use ArrayList to store dynamic number of students.
-    private int studentCount;
+    private final LinkedHashMap<String, Student> students = new LinkedHashMap<>();
 
     /**
      * Adds a student to the manager.
      *
      * @param student student to add
-     * @throws CapacityExceededException if the student capacity is reached
      * @throws NullPointerException if {@code student} is {@code null}
      */
     public void addStudent(Student student) {
-        if (studentCount >= students.length) {
-            throw new CapacityExceededException("model.Student capacity has been reached");
-        }
-        students[studentCount++] = java.util.Objects.requireNonNull(
-                student, "model.Student cannot be null");
+        Student value = Objects.requireNonNull(student, "Student cannot be null");
+        students.put(value.getStudentId().toUpperCase(Locale.ROOT), value);
     }
 
     /**
@@ -36,12 +34,10 @@ public class StudentManager implements Searchable {
      */
     @Override
     public Student findStudentById(String studentId) {
-        for (int index = 0; index < studentCount; index++) {
-            if (students[index].getStudentId().equalsIgnoreCase(studentId)) {
-                return students[index];
-            }
-        }
+        if (studentId == null || studentId.isBlank()) {
             return null;
+        }
+        return students.get(studentId.trim().toUpperCase(Locale.ROOT));
     }
 
     /**
@@ -52,17 +48,17 @@ public class StudentManager implements Searchable {
      */
     @Override
     public Student[] findStudentsByName(String name) {
-        String query = name.trim().toLowerCase();
-        Student[] matches = new Student[studentCount];
-        int matchCount = 0;
-
-        for (int index = 0; index < studentCount; index++) {
-            if (students[index].getName().toLowerCase().contains(query)) {
-                matches[matchCount++] = students[index];
+        if (name == null || name.isBlank()) {
+            return new Student[0];
+        }
+        String query = name.trim().toLowerCase(Locale.ROOT);
+        List<Student> matches = new ArrayList<>();
+        for (Student student : students.values()) {
+            if (student.getName().toLowerCase(Locale.ROOT).contains(query)) {
+                matches.add(student);
             }
         }
-
-        return Arrays.copyOf(matches, matchCount);
+        return matches.toArray(new Student[0]);
     }
 
     /**
@@ -74,17 +70,14 @@ public class StudentManager implements Searchable {
      */
     @Override
     public Student[] findStudentsByAverage(double minimum, double maximum) {
-        Student[] matches = new Student[studentCount];
-        int matchCount = 0;
-
-        for (int index = 0; index < studentCount; index++) {
-            double average = students[index].calculateAverageGrade();
+        List<Student> matches = new ArrayList<>();
+        for (Student student : students.values()) {
+            double average = student.calculateAverageGrade();
             if (average >= minimum && average <= maximum) {
-                matches[matchCount++] = students[index];
+                matches.add(student);
             }
         }
-
-        return Arrays.copyOf(matches, matchCount);
+        return matches.toArray(new Student[0]);
     }
 
     /**
@@ -95,17 +88,17 @@ public class StudentManager implements Searchable {
      */
     @Override
     public Student[] findStudentsByType(String studentType) {
+        if (studentType == null || studentType.isBlank()) {
+            return new Student[0];
+        }
         String query = studentType.trim();
-        Student[] matches = new Student[studentCount];
-        int matchCount = 0;
-
-        for (int index = 0; index < studentCount; index++) {
-            if (students[index].getStudentType().equalsIgnoreCase(query)) {
-                matches[matchCount++] = students[index];
+        List<Student> matches = new ArrayList<>();
+        for (Student student : students.values()) {
+            if (student.getStudentType().equalsIgnoreCase(query)) {
+                matches.add(student);
             }
         }
-
-        return Arrays.copyOf(matches, matchCount);
+        return matches.toArray(new Student[0]);
     }
 
     /**
@@ -114,7 +107,7 @@ public class StudentManager implements Searchable {
      * @return a copy of the stored students
      */
     public Student[] getStudents() {
-        return Arrays.copyOf(students, studentCount);
+        return students.values().toArray(new Student[0]);
     }
 
     /**
@@ -123,6 +116,6 @@ public class StudentManager implements Searchable {
      * @return the student count
      */
     public int getStudentCount() {
-        return studentCount;
+        return students.size();
     }
 }

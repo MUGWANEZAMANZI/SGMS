@@ -12,6 +12,9 @@ import java.util.Objects;
  * Provides interactive student-management operations.
  */
 public class StudentApplicationService {
+    private static final int REGULAR_STUDENT_SELECTION = 1;
+    private static final int HONORS_STUDENT_SELECTION = 2;
+
     private final StudentManager studentManager;
     private final InputReader inputReader;
 
@@ -36,12 +39,15 @@ public class StudentApplicationService {
         String phone = inputReader.readRequired("Phone: ");
 
         IO.println("\nStudent type:");
-        IO.println("1. Regular student");
-        IO.println("2. Honors student");
+        IO.println(REGULAR_STUDENT_SELECTION + ". Regular student");
+        IO.println(HONORS_STUDENT_SELECTION + ". Honors student");
 
-        int type = inputReader.readInt("Select type: ", 1, 2);
+        int type = inputReader.readInt(
+                "Select type: ",
+                REGULAR_STUDENT_SELECTION,
+                HONORS_STUDENT_SELECTION);
 
-        Student student = type == 1
+        Student student = type == REGULAR_STUDENT_SELECTION
                 ? new RegularStudent(name, age, email, phone)
                 : new HonorsStudent(name, age, email, phone);
 

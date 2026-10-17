@@ -2,6 +2,8 @@ package model;
 
 import exceptions.CapacityExceededException;
 import exceptions.InvalidInputException;
+
+import java.util.HashSet;
 import java.util.Objects;
 
 /**
@@ -10,7 +12,6 @@ import java.util.Objects;
 public abstract class Student {
 
     private static int nextStudentNumber = 1;
-
     private final String studentId;
     private final Grade[] grades = new Grade[200];
     private int gradeCount;
@@ -20,14 +21,20 @@ public abstract class Student {
     private String email;
     private String phone;
     private Status status;
+    private HashSet<String> subjects;
 
     protected Student(String name, int age, String email, String phone) {
+        this(name, age, email, phone, new HashSet<>());
+    }
+
+    protected Student(String name, int age, String email, String phone, HashSet<String> subjects) {
         this.studentId = "STU%03d".formatted(nextStudentNumber++);
         this.name = requireNonBlank(name, "Name");
         this.age = validateAge(age);
         this.email = requireNonBlank(email, "Email");
         this.phone = requireNonBlank(phone, "Phone");
         this.status = Status.ACTIVE;
+        this.subjects = new HashSet<>(Objects.requireNonNull(subjects, "Subjects cannot be null"));
     }
 
     /**
