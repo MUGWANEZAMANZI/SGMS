@@ -7,6 +7,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.regex.Pattern;
 
 /**
  * Stores and searches students.
@@ -99,6 +100,17 @@ public class StudentManager implements Searchable {
             }
         }
         return matches.toArray(new Student[0]);
+    }
+
+    @Override
+    public synchronized Student[] findStudentsByPattern(String namePattern) {
+        if (namePattern == null || namePattern.isBlank()) {
+            return new Student[0];
+        }
+        Pattern pattern = Pattern.compile(namePattern, Pattern.CASE_INSENSITIVE);
+        return students.values().stream()
+                .filter(student -> pattern.matcher(student.getName()).find())
+                .toArray(Student[]::new);
     }
 
     /**

@@ -17,6 +17,9 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.IntStream;
+import batch.ParallelBatchProcessor;
+import audit.AuditTrail;
 
 /**
  * Imports grades from CSV files into student and grade managers.
@@ -96,5 +99,66 @@ public class BulkImportService implements CSVParser {
         IO.println("Import log: " + summary.logFile());
         ApplicationLogger.info("CSV import completed: " + summary);
         return summary;
+    }
+
+    /**
+     * Imports CSV rows concurrently using a bounded worker pool.
+     *
+     * @param filePath CSV source
+     * @param workerCount number of processing workers
+     * @param auditTrail audit sink
+     * @return import summary
+     */
+    public ImportSummary importCSVParallel(
+            String filePath,
+            int workerCount,
+            AuditTrail auditTrail) throws IOException {
+        List<String> rows = Files.readAllLines(Path.of(filePath));
+        List<String> dataRows = rows.stream()
+                .skip(rows.isEmpty() ? 0 : 1)
+                .filter(row -> !row.isBlank())
+                .toList();
+        try (ParallelBatchProcessor<String, String> processor =
+                     new ParallelBatchProcessor<>(workerCount,
+                             row -> processParallelRow(row, auditTrail))) {
+            List<String> failures = processor.process(dataRows).stream()
+                    .filter(java.util.Objects::nonNull)
+                    .toList();
+            int imported = dataRows.size() - failures.size();
+            auditTrail.record("BULK_IMPORT",
+                    "Imported " + imported + " of " + dataRows.size());
+            return new ImportSummary(
+                    dataRows.size(), imported, failures.size(), "parallel-processing");
+        }
+    }
+
+    private String processParallelRow(String line, AuditTrail auditTrail) {
+        try {
+            String[] fields = line.split(COMMA_DELIMITER, -1);
+            if (fields.length != 4) {
+                return "Expected 4 columns";
+            }
+            Student student = studentManager.findStudentById(fields[0].trim());
+            if (student == null) {
+                throw new StudentNotFoundException(fields[0].trim());
+            }
+            String type = fields[2].trim();
+            Subject subject = type.equalsIgnoreCase("Core")
+                    ? new CoreSubject(fields[1].trim(), "IMPORT-CORE")
+                    : type.equalsIgnoreCase("Elective")
+                    ? new ElectiveSubject(fields[1].trim(), "IMPORT-ELECTIVE")
+                    : null;
+            if (subject == null) {
+                throw new ImportFormatException("Invalid subject type");
+            }
+            gradeManager.recordGrade(
+                    student, subject, Double.parseDouble(fields[3].trim()));
+            auditTrail.record("GRADE_IMPORT", fields[0].trim());
+            return null;
+        } catch (StudentNotFoundException | ImportFormatException
+                 | NumberFormatException exception) {
+            auditTrail.record("GRADE_IMPORT_FAILURE", exception.getMessage());
+            return exception.getMessage();
+        }
     }
 }
