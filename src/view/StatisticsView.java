@@ -23,7 +23,11 @@ public class StatisticsView {
 
     /** Calculates and displays the current class statistics. */
     public void displayStatistics() {
-        StatisticsResult statistics = statisticsCalculator.calculate();
+        displayStatistics(statisticsCalculator.calculate());
+    }
+
+    /** Displays a previously calculated statistics snapshot. */
+    public void displayStatistics(StatisticsResult statistics) {
 
         IO.println("\n============= CLASS STATISTICS =============");
         IO.println("Total Students: " + statistics.getTotalStudents());

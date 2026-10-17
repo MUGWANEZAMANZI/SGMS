@@ -15,12 +15,14 @@ import report.StudentImportService;
 import report.GradeReportFileService;
 import view.Menu;
 import view.GPAView;
+import view.StatisticsView;
 import logging.ApplicationLogger;
 import exceptions.FileExportException;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.Duration;
 
 
 /**
@@ -92,15 +94,29 @@ public class Main implements ApplicationActions {
     private void start() {
         StudentApplicationService studentApplicationService =
                 new StudentApplicationService(studentManager, inputReader);
-        new Menu(
+        StatisticsView statisticsView =
+                new StatisticsView(new StatisticsCalculator(studentManager, gradeManager));
+        try (StatisticsDashboard dashboard = new StatisticsDashboard(
+                new StatisticsCalculator(studentManager, gradeManager),
+                statisticsView::displayStatistics);
+             ScheduledGpaProcessor gpaProcessor = new ScheduledGpaProcessor(
+                     studentManager,
+                     new RankingService(gradeManager, new GPACalculator()),
+                     result -> IO.println("GPA updated for "
+                             + result.student().getName() + ": "
+                             + "%.2f".formatted(result.cumulativeGpa())))) {
+            dashboard.start(Duration.ofSeconds(5));
+            gpaProcessor.start(Duration.ofSeconds(5));
+            new Menu(
                 studentApplicationService,
                 gradeService,
                 studentSearchService,
                 new BulkImportService(studentManager, gradeManager),
                 inputReader,
-                new view.StatisticsView(new StatisticsCalculator(studentManager, gradeManager)),
+                statisticsView,
                 this,
                 new StudentImportService(studentManager)).start();
+        }
     }
 
     /** Delegates GPA input and presentation to the GPA view. */
