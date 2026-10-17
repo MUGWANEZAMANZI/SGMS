@@ -6,6 +6,7 @@ import services.BulkImportService;
 import services.GradeService;
 import services.StudentApplicationService;
 import services.StudentSearchService;
+import report.StudentImportService;
 
 import java.io.IOException;
 import java.util.LinkedHashMap;
@@ -32,6 +33,7 @@ public class Menu {
     private final StudentSearchService studentSearchService;
     private final StatisticsView statisticsView;
     private final ApplicationActions applicationActions;
+    private final StudentImportService studentImportService;
 
     /**
      * Creates a menu with its application services and actions.
@@ -52,6 +54,25 @@ public class Menu {
             InputReader inputReader,
             StatisticsView statisticsView,
             ApplicationActions applicationActions) {
+        this(studentApplicationService, gradeService, studentSearchService,
+                bulkImportService, inputReader, statisticsView,
+                applicationActions, null);
+    }
+
+    /**
+     * Creates a menu with student import support.
+     *
+     * @param studentImportService imports students from supported file formats
+     */
+    public Menu(
+            StudentApplicationService studentApplicationService,
+            GradeService gradeService,
+            StudentSearchService studentSearchService,
+            BulkImportService bulkImportService,
+            InputReader inputReader,
+            StatisticsView statisticsView,
+            ApplicationActions applicationActions,
+            StudentImportService studentImportService) {
 
         this.studentApplicationService = studentApplicationService;
         this.inputReader = inputReader;
@@ -60,8 +81,7 @@ public class Menu {
         this.studentSearchService = studentSearchService;
         this.statisticsView = statisticsView;
         this.applicationActions = applicationActions;
-
-
+        this.studentImportService = studentImportService;
 
         options.put(1, "Add model.Student");
         options.put(2, "View Students");
@@ -73,6 +93,7 @@ public class Menu {
         options.put(8, "View Class Statistics");
         options.put(9, "Search Students");
         options.put(10, "Exit");
+        options.put(11, "Import Students");
     }
 
     /** Starts the interactive menu loop. */
@@ -82,7 +103,7 @@ public class Menu {
         boolean running = true;
         while (running) {
             showOptions();
-            int option = inputReader.readInt("Choose an option: ", 1, 10);
+            int option = inputReader.readInt("Choose an option: ", 1, 11);
             running = handleOptions(option);
 
             if (running) {
@@ -124,6 +145,17 @@ public class Menu {
                 case 7 -> bulkImportService.importCSV("imports/grades_100.csv");
                 case 8 ->  statisticsView.displayStatistics();
                 case 9 -> studentSearchService.search();
+                case 11 -> {
+                    if (studentImportService == null) {
+                        IO.println("Student import is not configured.");
+                        break;
+                    }
+                    String path = inputReader.readRequired(
+                            "Enter student file path (.csv, .json, or .bin): ");
+                    int imported = studentImportService.importStudents(
+                            java.nio.file.Path.of(path));
+                    IO.println(imported + " students imported successfully.");
+                }
                 case 10 -> {
                     IO.println("\nThank you for using the Student Grade Management System!");
                     IO.println("Goodbye!");

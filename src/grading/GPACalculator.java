@@ -2,8 +2,11 @@ package grading;
 
 import model.Grade;
 import model.GradePoint;
+import model.Student;
 
+import java.util.HashMap;
 import java.util.Objects;
+import java.util.TreeMap;
 
 /**
  * Calculates GPA values using a configurable grade scale.
@@ -60,4 +63,6 @@ public final class GPACalculator implements GradeScale {
         }
         return totalGpa / grades.length;
     }
+
+
 }

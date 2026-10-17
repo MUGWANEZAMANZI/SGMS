@@ -1,5 +1,8 @@
 package input;
 
+import exceptions.InvalidInputException;
+import validation.ValidationPatterns;
+
 /**
  * Reads validated values from the console.
  */
@@ -69,7 +72,7 @@ public class ConsoleInputReader implements InputReader {
     }
 
     /**
-     * Reads an email address containing an at sign.
+     * Reads an email address matching the application's email format.
      *
      * @param prompt prompt shown to the user
      * @return the entered email address
@@ -78,11 +81,11 @@ public class ConsoleInputReader implements InputReader {
     public String readEmail(String prompt) {
         while (true) {
             String value = readLine(prompt);
-            if (value != null && !value.isBlank() ) {
-                if(!value.contains("@")){
+            if (value != null && !value.isBlank()) {
+                try {
+                    return ValidationPatterns.requireEmail(value);
+                } catch (InvalidInputException exception) {
                     IO.println("Invalid email format.");
-                } else {
-                    return value.trim();
                 }
             } else {
                 IO.println("This Email field is required.");

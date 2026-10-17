@@ -38,4 +38,14 @@ public interface Searchable {
      * @return matching students
      */
     Student[] findStudentsByType(String studentType);
+
+    /**
+     * Finds students whose names match a regular expression.
+     *
+     * @param namePattern regular expression applied to student names
+     * @return matching students
+     */
+    default Student[] findStudentsByPattern(String namePattern) {
+        throw new UnsupportedOperationException("Pattern search is not supported");
+    }
 }

@@ -24,7 +24,7 @@ public class GradeManager implements Gradable {
      * @throws CapacityExceededException if the grade capacity is reached
      * @throws NullPointerException if {@code grade} is {@code null}
      */
-    public void addGrade(Grade grade) {
+    public synchronized void addGrade(Grade grade) {
         if (gradeCount >= grades.length) {
             throw new CapacityExceededException("model.Grade capacity has been reached");
         }
@@ -39,7 +39,7 @@ public class GradeManager implements Gradable {
      * @param value percentage value
      * @throws InvalidGradeException if {@code value} is outside 0 through 100
      */
-    public void recordGrade(Student student, Subject subject, double value) {
+    public synchronized void recordGrade(Student student, Subject subject, double value) {
         if (!validateGrade(value)) {
             throw new InvalidGradeException(value);
         }
@@ -76,7 +76,7 @@ public class GradeManager implements Gradable {
      * @param studentId student identifier
      * @return matching grades
      */
-    public Grade[] getGradesByStudent(String studentId) {
+    public synchronized Grade[] getGradesByStudent(String studentId) {
         Grade[] result = new Grade[gradeCount];
         int resultCount = 0;
         for (int index = 0; index < gradeCount; index++) {
@@ -92,7 +92,7 @@ public class GradeManager implements Gradable {
      *
      * @return the grade count
      */
-    public int getGradeCount() {
+    public synchronized int getGradeCount() {
         return gradeCount;
     }
 
@@ -101,7 +101,7 @@ public class GradeManager implements Gradable {
      *
      * @return a copy of the stored grades
      */
-    public Grade[] getGrades() {
+    public synchronized Grade[] getGrades() {
         return Arrays.copyOf(grades, gradeCount);
     }
 }

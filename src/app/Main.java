@@ -3,10 +3,7 @@ package app;
 import input.InputReader;
 import input.ConsoleInputReader;
 import grading.GPACalculator;
-import services.GradeService;
-import services.BulkImportService;
-import services.StudentApplicationService;
-import services.StudentSearchService;
+import services.*;
 import manager.GradeManager;
 import manager.StudentManager;
 import manager.StatisticsCalculator;
@@ -14,13 +11,18 @@ import model.*;
 import report.GradeReport;
 import report.GradeReportService;
 import report.TextGradeReportExporter;
+import report.StudentImportService;
+import report.GradeReportFileService;
 import view.Menu;
+import view.GPAView;
+import view.StatisticsView;
 import logging.ApplicationLogger;
 import exceptions.FileExportException;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.Duration;
 
 
 /**
@@ -32,8 +34,9 @@ public class Main implements ApplicationActions {
     private final InputReader inputReader;
     private final GradeService gradeService;
     private final StudentSearchService studentSearchService;
-    private final GPACalculator gpaCalculator;
+    private final GPAView gpaView;
     private final GradeReportService reportService;
+    private final GradeReportFileService reportFileService;
 
     /**
      * Creates an application coordinator with its required services.
@@ -60,8 +63,12 @@ public class Main implements ApplicationActions {
         this.inputReader = inputReader;
         this.gradeService = gradeService;
         this.studentSearchService = studentSearchService;
-        this.gpaCalculator = gpaCalculator;
+        this.gpaView = new GPAView(
+                studentManager,
+                inputReader,
+                new RankingService(gradeManager, gpaCalculator));
         this.reportService = reportService;
+        this.reportFileService = new GradeReportFileService();
     }
 
     /**
@@ -87,51 +94,35 @@ public class Main implements ApplicationActions {
     private void start() {
         StudentApplicationService studentApplicationService =
                 new StudentApplicationService(studentManager, inputReader);
-        new Menu(
+        StatisticsView statisticsView =
+                new StatisticsView(new StatisticsCalculator(studentManager, gradeManager));
+        try (StatisticsDashboard dashboard = new StatisticsDashboard(
+                new StatisticsCalculator(studentManager, gradeManager),
+                statisticsView::displayStatistics);
+             ScheduledGpaProcessor gpaProcessor = new ScheduledGpaProcessor(
+                     studentManager,
+                     new RankingService(gradeManager, new GPACalculator()),
+                     result -> IO.println("GPA updated for "
+                             + result.student().getName() + ": "
+                             + "%.2f".formatted(result.cumulativeGpa())))) {
+            dashboard.start(Duration.ofSeconds(5));
+            gpaProcessor.start(Duration.ofSeconds(5));
+            new Menu(
                 studentApplicationService,
                 gradeService,
                 studentSearchService,
                 new BulkImportService(studentManager, gradeManager),
                 inputReader,
-                new view.StatisticsView(new StatisticsCalculator(studentManager, gradeManager)),
-                this).start();
+                statisticsView,
+                this,
+                new StudentImportService(studentManager)).start();
+        }
     }
 
-    /** Calculates and displays the selected student's GPA and class rank. */
+    /** Delegates GPA input and presentation to the GPA view. */
     @Override
     public void calculateStudentGPA() {
-        IO.println("\n============= CALCULATE GPA =============");
-        String studentId = inputReader.readRequired(
-                "Enter the student ID to calculate GPA: ").toUpperCase();
-        Student student = studentManager.findStudentById(studentId);
-        if (student == null) {
-            IO.println("No student found with ID " + studentId + ".");
-            return;
-        }
-
-        Grade[] grades = gradeManager.getGradesByStudent(student.getStudentId());
-        double average = student.calculateAverageGrade();
-        double cumulativeGpa = gpaCalculator.calculateCumulativeGPA(grades);
-
-        IO.println("\nmodel.Student: %s - %s".formatted(student.getStudentId(), student.getName()));
-        IO.println("Overall average: %.2f%%".formatted(average));
-        IO.println("\n%-22s %-12s %-8s %-8s".formatted(
-                "SUBJECT", "PERCENTAGE", "GPA", "LETTER"));
-        IO.println("--------------------------------------------------------");
-        for (Grade grade : grades) {
-            GradePoint result = gpaCalculator.convertPercentageToGPA(
-                    grade.getValue());
-            IO.println("%-22s %9.2f%% %8.1f %-8s".formatted(
-                    grade.getSubject().getSubjectName(),
-                    result.percentage(),
-                    result.gpa(),
-                    result.letterGrade()));
-        }
-        IO.println("--------------------------------------------------------");
-        IO.println("Cumulative GPA: %.2f / 4.00".formatted(cumulativeGpa));
-        IO.println("Class rank: %d of %d".formatted(
-                calculateClassRank(cumulativeGpa), studentManager.getStudentCount()));
-        IO.println("Status: " + statusText(student));
+        gpaView.displayStudentGPA();
     }
 
 
@@ -208,7 +199,7 @@ public class Main implements ApplicationActions {
         Path file = directory.resolve(studentId.toUpperCase() + "_report.txt");
         try {
             Files.createDirectories(directory);
-            new TextGradeReportExporter().export(report, file);
+            reportFileService.export(report, file);
             IO.println("Report exported to " + file.toAbsolutePath());
         } catch (IOException exception) {
             ApplicationLogger.error("Could not export grade report", exception);
@@ -226,22 +217,4 @@ public class Main implements ApplicationActions {
         inputReader.pause();
     }
 
-    private String statusText(Student student) {
-        if (student.getGrades().length == 0) {
-            return "No grades";
-        }
-        return student.isPassing() ? "Passing" : "Failing";
-    }
-
-    private int calculateClassRank(double studentGpa) {
-        int rank = 1;
-        for (Student student : studentManager.getStudents()) {
-            double classGpa = gpaCalculator.calculateCumulativeGPA(
-                    gradeManager.getGradesByStudent(student.getStudentId()));
-            if (classGpa > studentGpa) {
-                rank++;
-            }
-        }
-        return rank;
-    }
 }

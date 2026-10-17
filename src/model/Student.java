@@ -2,7 +2,10 @@ package model;
 
 import exceptions.CapacityExceededException;
 import exceptions.InvalidInputException;
+
+import java.util.HashSet;
 import java.util.Objects;
+import validation.ValidationPatterns;
 
 /**
  * Base class for students and their recorded grades.
@@ -10,7 +13,6 @@ import java.util.Objects;
 public abstract class Student {
 
     private static int nextStudentNumber = 1;
-
     private final String studentId;
     private final Grade[] grades = new Grade[200];
     private int gradeCount;
@@ -20,14 +22,20 @@ public abstract class Student {
     private String email;
     private String phone;
     private Status status;
+    private HashSet<String> subjects;
 
     protected Student(String name, int age, String email, String phone) {
+        this(name, age, email, phone, new HashSet<>());
+    }
+
+    protected Student(String name, int age, String email, String phone, HashSet<String> subjects) {
         this.studentId = "STU%03d".formatted(nextStudentNumber++);
         this.name = requireNonBlank(name, "Name");
         this.age = validateAge(age);
-        this.email = requireNonBlank(email, "Email");
-        this.phone = requireNonBlank(phone, "Phone");
+        this.email = ValidationPatterns.requireEmail(email);
+        this.phone = ValidationPatterns.requirePhone(phone);
         this.status = Status.ACTIVE;
+        this.subjects = new HashSet<>(Objects.requireNonNull(subjects, "Subjects cannot be null"));
     }
 
     /**
@@ -93,7 +101,7 @@ public abstract class Student {
      * @throws InvalidInputException if {@code email} is blank
      */
     public void setEmail(String email) {
-        this.email = requireNonBlank(email, "Email");
+        this.email = ValidationPatterns.requireEmail(email);
     }
 
     /**
@@ -112,7 +120,7 @@ public abstract class Student {
      * @throws InvalidInputException if {@code phone} is blank
      */
     public void setPhone(String phone) {
-        this.phone = requireNonBlank(phone, "Phone");
+        this.phone = ValidationPatterns.requirePhone(phone);
     }
 
     /**
@@ -141,7 +149,7 @@ public abstract class Student {
      * @throws CapacityExceededException if the grade capacity has been reached
      * @throws NullPointerException if {@code grade} is {@code null}
      */
-    public void addGrade(Grade grade) {
+    public synchronized void addGrade(Grade grade) {
         if (gradeCount >= grades.length) {
             throw new CapacityExceededException("model.Grade capacity has been reached");
         }
@@ -153,7 +161,7 @@ public abstract class Student {
      *
      * @return a copy of the recorded grades
      */
-    public Grade[] getGrades() {
+    public synchronized Grade[] getGrades() {
         return java.util.Arrays.copyOf(grades, gradeCount);
     }
 
@@ -162,7 +170,7 @@ public abstract class Student {
      *
      * @return the average grade, or {@code 0.0} if no grades are recorded
      */
-    public double calculateAverageGrade() {
+    public synchronized double calculateAverageGrade() {
         if (gradeCount == 0) {
             return 0.0;
         }
@@ -179,7 +187,7 @@ public abstract class Student {
      *
      * @return {@code true} when the student has grades and meets the threshold
      */
-    public boolean isPassing() {
+    public synchronized boolean isPassing() {
         return gradeCount > 0 && calculateAverageGrade() >= getPassingGrade();
     }
 

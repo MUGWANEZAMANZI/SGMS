@@ -4,7 +4,6 @@ package model;
  * Represents a student using the regular passing threshold.
  */
 public class RegularStudent extends Student {
-
     /**
      * Creates a regular student.
      *
