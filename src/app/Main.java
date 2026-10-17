@@ -11,6 +11,7 @@ import model.*;
 import report.GradeReport;
 import report.GradeReportService;
 import report.TextGradeReportExporter;
+import report.StudentImportService;
 import view.Menu;
 import view.GPAView;
 import logging.ApplicationLogger;
@@ -95,7 +96,8 @@ public class Main implements ApplicationActions {
                 new BulkImportService(studentManager, gradeManager),
                 inputReader,
                 new view.StatisticsView(new StatisticsCalculator(studentManager, gradeManager)),
-                this).start();
+                this,
+                new StudentImportService(studentManager)).start();
     }
 
     /** Delegates GPA input and presentation to the GPA view. */
