@@ -12,6 +12,8 @@ import exceptions.FileExportException;
 import exceptions.InvalidInputException;
 
 import java.util.Objects;
+import cache.ThreadSafeLruCache;
+import java.time.Duration;
 
 /**
  * Provides interactive student searching and result export.
@@ -19,6 +21,8 @@ import java.util.Objects;
 public final class StudentSearchService {
     private final Searchable studentSearch;
     private final InputReader inputReader;
+    private final ThreadSafeLruCache<String, Student[]> patternCache =
+            new ThreadSafeLruCache<>(100, Duration.ofMinutes(5));
 
     /**
      * Creates a student search service.
@@ -31,6 +35,27 @@ public final class StudentSearchService {
                 studentSearch, "Student search cannot be null");
         this.inputReader = Objects.requireNonNull(
                 inputReader, "Input reader cannot be null");
+    }
+
+    /**
+     * Executes a case-insensitive regex query against student names.
+     *
+     * @param pattern regular expression
+     * @return matching students
+     */
+    public Student[] searchByPattern(String pattern) {
+        Student[] cached = patternCache.get(pattern);
+        if (cached != null) {
+            return cached.clone();
+        }
+        Student[] results = studentSearch.findStudentsByPattern(pattern);
+        patternCache.put(pattern, results.clone());
+        return results;
+    }
+
+    /** Clears cached search results after student data changes. */
+    public void clearSearchCache() {
+        patternCache.clear();
     }
 
     /** Interactively searches for students and presents the results. */
