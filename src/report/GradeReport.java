@@ -35,4 +35,25 @@ public record GradeReport(
                "Elective Average: " + electiveAverage + "," +
                "Passing: " + passing + "\n";
     }
+
+    public String generateJsonReport()
+    {
+    return "{\n" +
+           "  \"student\": \"" + student.getName() + "\",\n" +
+           "  \"overallAverage\": " + overallAverage + ",\n" +
+           "  \"coreAverage\": " + coreAverage + ",\n" +
+           "  \"electiveAverage\": " + electiveAverage + ",\n" +
+           "  \"passing\": " + passing + "\n" +
+           "}";
+    }
+
+    public String generateCsvReport()
+    {
+        return "Student,Overall Average,Core Average,Elective Average,Passing\n" +
+               student.getName() + "," +
+               overallAverage + "," +
+               coreAverage + "," +
+               electiveAverage + "," +
+               passing + "\n";
+    }
 }
