@@ -8,15 +8,28 @@ import model.Student;
 
 import java.util.Objects;
 
+/**
+ * Provides interactive student-management operations.
+ */
 public class StudentApplicationService {
+    private static final int REGULAR_STUDENT_SELECTION = 1;
+    private static final int HONORS_STUDENT_SELECTION = 2;
+
     private final StudentManager studentManager;
     private final InputReader inputReader;
 
+    /**
+     * Creates a student application service.
+     *
+     * @param studentManager manager used to store students
+     * @param inputReader reader used for interactive input
+     */
     public StudentApplicationService(StudentManager studentManager, InputReader inputReader) {
         this.studentManager = Objects.requireNonNull(studentManager);
         this.inputReader = Objects.requireNonNull(inputReader);
     }
 
+    /** Interactively creates and adds a student. */
     public void addStudent() {
         IO.println("\n============= ADD STUDENT =============");
 
@@ -26,12 +39,15 @@ public class StudentApplicationService {
         String phone = inputReader.readRequired("Phone: ");
 
         IO.println("\nStudent type:");
-        IO.println("1. Regular student");
-        IO.println("2. Honors student");
+        IO.println(REGULAR_STUDENT_SELECTION + ". Regular student");
+        IO.println(HONORS_STUDENT_SELECTION + ". Honors student");
 
-        int type = inputReader.readInt("Select type: ", 1, 2);
+        int type = inputReader.readInt(
+                "Select type: ",
+                REGULAR_STUDENT_SELECTION,
+                HONORS_STUDENT_SELECTION);
 
-        Student student = type == 1
+        Student student = type == REGULAR_STUDENT_SELECTION
                 ? new RegularStudent(name, age, email, phone)
                 : new HonorsStudent(name, age, email, phone);
 
@@ -40,6 +56,7 @@ public class StudentApplicationService {
         IO.println("Student added successfully!");
     }
 
+    /** Displays all stored students and their summaries. */
     public void viewStudents() {
         IO.println("\n=============== STUDENTS ===============");
 

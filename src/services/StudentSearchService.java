@@ -3,13 +3,29 @@ package services;
 import input.InputReader;
 import manager.Searchable;
 import model.Student;
+import logging.ApplicationLogger;
+import view.StudentView;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import exceptions.FileExportException;
+import exceptions.InvalidInputException;
 
 import java.util.Objects;
 
+/**
+ * Provides interactive student searching and result export.
+ */
 public final class StudentSearchService {
     private final Searchable studentSearch;
     private final InputReader inputReader;
 
+    /**
+     * Creates a student search service.
+     *
+     * @param studentSearch search implementation to use
+     * @param inputReader reader used for interactive input
+     */
     public StudentSearchService(Searchable studentSearch, InputReader inputReader) {
         this.studentSearch = Objects.requireNonNull(
                 studentSearch, "Student search cannot be null");
@@ -17,6 +33,7 @@ public final class StudentSearchService {
                 inputReader, "Input reader cannot be null");
     }
 
+    /** Interactively searches for students and presents the results. */
     public void search() {
         IO.println("\n============= SEARCH STUDENTS =============");
         IO.println("1. By Student ID");
@@ -55,11 +72,22 @@ public final class StudentSearchService {
                 results = studentSearch.findStudentsByType(
                         type == 1 ? "Regular" : "Honors");
             }
-            default -> throw new IllegalStateException(
+            default -> throw new InvalidInputException(
                     "Unsupported search option: " + option);
         }
 
         displayResults(results);
+        if (results.length > 0) {
+            IO.println("\nActions: 1. View details  2. Export results  3. New search  4. Return");
+            int action = inputReader.readInt("Select action: ", 1, 4);
+            if (action == 1) {
+                new StudentView().display(results[0]);
+            } else if (action == 2) {
+                exportResults(results);
+            } else if (action == 3) {
+                search();
+            }
+        }
     }
 
     private void displayResults(Student[] students) {
@@ -78,6 +106,27 @@ public final class StudentSearchService {
                     student.getName(),
                     student.getStudentType(),
                     student.calculateAverageGrade()));
+        }
+    }
+
+    private static void exportResults(Student[] students) {
+        try {
+            Path directory = Path.of("grade_reports");
+            Files.createDirectories(directory);
+            Path file = directory.resolve("search-results.csv");
+            StringBuilder content = new StringBuilder("studentId,name,type,average\n");
+            for (Student student : students) {
+                content.append(student.getStudentId()).append(',')
+                        .append(student.getName()).append(',')
+                        .append(student.getStudentType()).append(',')
+                        .append(student.calculateAverageGrade()).append('\n');
+            }
+            Files.writeString(file, content);
+            IO.println("Search results exported to " + file.toAbsolutePath());
+            ApplicationLogger.info("Search results exported to " + file);
+        } catch (IOException exception) {
+            ApplicationLogger.error("Could not export search results", exception);
+            throw new FileExportException("Could not export search results", exception);
         }
     }
 }

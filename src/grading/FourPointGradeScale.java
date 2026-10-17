@@ -1,12 +1,24 @@
 package grading;
 
+import exceptions.InvalidInputException;
 import model.GradePoint;
 
+/**
+ * Converts percentage grades using a four-point GPA scale.
+ */
 public class FourPointGradeScale implements GradeScale {
+
+    /**
+     * Converts a percentage grade to a GradePoint object based on the 4.0 GPA scale.
+     *
+     * @param percentage the percentage grade to convert
+     * @return a GradePoint object representing the corresponding GPA and letter grade
+     * @throws InvalidInputException if the percentage is not between 0 and 100
+     */
     @Override
     public GradePoint convertPercentageToGPA(double percentage) {
     if(percentage < 0 || percentage > 100) {
-        throw new IllegalArgumentException("Percentage must be between 0 and 100");
+        throw new InvalidInputException("Percentage must be between 0 and 100");
     }
         if (percentage >= 93) {
             return new GradePoint(percentage, 4.0, "A");

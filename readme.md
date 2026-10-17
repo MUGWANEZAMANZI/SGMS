@@ -94,7 +94,7 @@ flowchart LR
 ```
 
 A standalone copy of the diagram is available in
-[`docs/use-case-diagram.md`](docs/use-case-diagram.md).
+[`use-case-diagram.md`](use-case-diagram.md).
 
 ## Requirements
 
@@ -187,3 +187,38 @@ The use-case diagram also identifies every implemented type: `Main`, `Menu`,
 `Student`, `RegularStudent`, `HonorsStudent`, `Subject`, `CoreSubject`,
 `ElectiveSubject`, `Grade`, `StudentManager`, `GradeManager`, `Gradable`, and
 `StudentView`.
+
+## Testing and coverage
+
+Run the complete JUnit and Mockito suite with Maven:
+
+```powershell
+mvn clean test
+```
+
+The latest local run contains 61 passing tests and exceeds the required 80%
+instruction and line coverage:
+
+| Metric | Coverage |
+| --- | ---: |
+| Instructions | 80.6% |
+| Lines | 80.2% |
+| Methods | 83.9% |
+| Classes | 91.9% |
+| Branches | 71.8% |
+
+After the command completes, open the generated HTML report in a browser:
+
+```text
+target/site/jacoco/index.html
+```
+
+From IntelliJ IDEA, use **Run > Run All Tests with Coverage**, then open the
+JaCoCo report from the coverage results window.
+
+## Project documentation
+
+- [Student Grade Management I requirements](Student-Grade-Mgt-I.md)
+- [Student Grade Management II requirements](Student-Grade-Mgt-II.md)
+- [Changelog](CHANGELOG.md)
+- [Use-case and source/test architecture diagram](use-case-diagram.md)

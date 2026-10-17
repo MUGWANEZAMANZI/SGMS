@@ -1,6 +1,6 @@
 package view;
 
-import app.Main;
+import app.ApplicationActions;
 import input.InputReader;
 import services.BulkImportService;
 import services.GradeService;
@@ -11,7 +11,17 @@ import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import view.StatisticsView;
+import logging.ApplicationLogger;
+import exceptions.CapacityExceededException;
+import exceptions.FileExportException;
+import exceptions.ImportFormatException;
+import exceptions.InvalidGradeException;
+import exceptions.InvalidInputException;
+import exceptions.StudentNotFoundException;
 
+/**
+ * Presents the application's interactive main menu.
+ */
 public class Menu {
 
     private final Map<Integer, String> options = new LinkedHashMap<>();
@@ -21,19 +31,35 @@ public class Menu {
     private final GradeService gradeService;
     private final StudentSearchService studentSearchService;
     private final StatisticsView statisticsView;
+    private final ApplicationActions applicationActions;
+
+    /**
+     * Creates a menu with its application services and actions.
+     *
+     * @param studentApplicationService handles student operations
+     * @param gradeService handles grade operations
+     * @param studentSearchService handles student searches
+     * @param bulkImportService handles CSV imports
+     * @param inputReader reads menu input
+     * @param statisticsView displays statistics
+     * @param applicationActions handles report and GPA actions
+     */
     public Menu(
             StudentApplicationService studentApplicationService,
             GradeService gradeService,
             StudentSearchService studentSearchService,
             BulkImportService bulkImportService,
             InputReader inputReader,
-            StatisticsView statisticsView) {
+            StatisticsView statisticsView,
+            ApplicationActions applicationActions) {
+
         this.studentApplicationService = studentApplicationService;
         this.inputReader = inputReader;
         this.bulkImportService = bulkImportService;
         this.gradeService = gradeService;
         this.studentSearchService = studentSearchService;
         this.statisticsView = statisticsView;
+        this.applicationActions = applicationActions;
 
 
 
@@ -49,6 +75,7 @@ public class Menu {
         options.put(10, "Exit");
     }
 
+    /** Starts the interactive menu loop. */
     public void start() {
         showHeader();
 
@@ -59,7 +86,7 @@ public class Menu {
             running = handleOptions(option);
 
             if (running) {
-                Main.pause();
+                applicationActions.pause();
             }
         }
     }
@@ -78,6 +105,12 @@ public class Menu {
         IO.println("---------------------------------------------");
     }
 
+    /**
+     * Handles a selected menu option.
+     *
+     * @param option selected option number
+     * @return {@code false} when the user selects exit; otherwise {@code true}
+     */
     public boolean handleOptions(int option)
     {
         try {
@@ -85,9 +118,9 @@ public class Menu {
                 case 1 -> studentApplicationService.addStudent();
                 case 2 -> studentApplicationService.viewStudents();
                 case 3 -> gradeService.recordGrade();
-                case 4 -> Main.viewGradeReport();
-                case 5 -> Main.exportGradeReport();
-                case 6 -> Main.calculateStudentGPA();
+                case 4 -> applicationActions.viewGradeReport();
+                case 5 -> applicationActions.exportGradeReport();
+                case 6 -> applicationActions.calculateStudentGPA();
                 case 7 -> bulkImportService.importCSV("imports/grades_100.csv");
                 case 8 ->  statisticsView.displayStatistics();
                 case 9 -> studentSearchService.search();
@@ -98,9 +131,13 @@ public class Menu {
                 }
                 default -> IO.println("Invalid option.");
             }
-        } catch (IllegalArgumentException | IllegalStateException exception) {
+        } catch (InvalidInputException
+                 | CapacityExceededException
+                 | FileExportException exception) {
+            ApplicationLogger.error("Menu operation failed", exception);
             IO.println("\nInput error: " + exception.getMessage());
         } catch (IOException e) {
+            ApplicationLogger.error("File operation failed", e);
             IO.println("\nCould not import CSV file:: " + e.getMessage());
         }
 

@@ -1,6 +1,9 @@
 package services;
 
 import grading.GPACalculator;
+import exceptions.InvalidGradeException;
+import exceptions.InvalidInputException;
+import exceptions.StudentNotFoundException;
 import manager.GradeManager;
 import manager.StudentManager;
 import model.CoreSubject;
@@ -18,7 +21,7 @@ class ExceptionPathTest {
         RegularStudent student = new RegularStudent(
                 "Alice", 20, "alice@example.com", "0712345678");
 
-        assertThrows(IllegalArgumentException.class, () ->
+        assertThrows(InvalidGradeException.class, () ->
                 gradeManager.recordGrade(
                         student, new CoreSubject("Mathematics", "CORE001"), 101));
     }
@@ -34,7 +37,7 @@ class ExceptionPathTest {
         GradeReportService service = new GradeReportService(
                 new StudentManager(), new GradeManager());
 
-        assertThrows(IllegalArgumentException.class, () -> service.createReport(" "));
+        assertThrows(InvalidInputException.class, () -> service.createReport(" "));
     }
 
     @Test
@@ -42,7 +45,15 @@ class ExceptionPathTest {
         GradeReportService service = new GradeReportService(
                 new StudentManager(), new GradeManager());
 
-        assertThrows(IllegalArgumentException.class,
+        assertThrows(StudentNotFoundException.class,
                 () -> service.createReport("STU999"));
+    }
+
+    @Test
+    void subjectRejectsBlankNameAndCode() {
+        assertThrows(InvalidInputException.class,
+                () -> new CoreSubject("", "CORE001"));
+        assertThrows(InvalidInputException.class,
+                () -> new CoreSubject("Mathematics", ""));
     }
 }

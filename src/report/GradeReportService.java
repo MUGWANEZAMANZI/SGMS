@@ -1,5 +1,7 @@
 package report;
 
+import exceptions.StudentNotFoundException;
+import exceptions.InvalidInputException;
 import manager.GradeManager;
 import manager.StudentManager;
 import model.CoreSubject;
@@ -9,23 +11,40 @@ import model.Student;
 
 import java.util.Objects;
 
+/**
+ * Creates grade reports from managed students and grades.
+ */
 public class GradeReportService {
     private final StudentManager studentManager;
     private final GradeManager gradeManager;
 
+    /**
+     * Creates a report service with the supplied managers.
+     *
+     * @param studentManager manager used to find students
+     * @param gradeManager manager used to retrieve grades
+     */
     public GradeReportService(StudentManager studentManager, GradeManager gradeManager) {
         this.studentManager = Objects.requireNonNull(studentManager, "Student manager cannot be null");
         this.gradeManager = Objects.requireNonNull(gradeManager, "Grade manager cannot be null");
     }
 
+    /**
+     * Creates a report for a student.
+     *
+     * @param studentId identifier of the student
+     * @return the generated report
+     * @throws InvalidInputException if {@code studentId} is blank
+     * @throws StudentNotFoundException if no student has the identifier
+     */
     public GradeReport createReport(String studentId) {
         if (studentId == null || studentId.isBlank()) {
-            throw new IllegalArgumentException("Student ID cannot be blank");
+            throw new InvalidInputException("Student ID cannot be blank");
         }
 
         Student student = studentManager.findStudentById(studentId);
         if (student == null) {
-            throw new IllegalArgumentException("Student not found: " + studentId);
+            throw new StudentNotFoundException(studentId);
         }
 
         Grade[] grades = gradeManager.getGradesByStudent(student.getStudentId());
@@ -54,6 +73,14 @@ public class GradeReportService {
         );
     }
 
+    /**
+     * Creates the report used for export.
+     *
+     * @param studentId identifier of the student
+     * @return the generated report
+     * @throws InvalidInputException if {@code studentId} is blank
+     * @throws StudentNotFoundException if no student has the identifier
+     */
     public GradeReport exportReport(String studentId) {
         return createReport(studentId);
     }

@@ -8,12 +8,23 @@ import model.GradePoint;
 
 import java.util.Objects;
 
+/**
+ * Provides GPA conversion and interactive GPA calculation.
+ */
 public final class GPAService {
     private final GradeScale gradeScale;
     private final GradeManager gradeManager;
     private final StudentManager studentManager;
     private final InputReader inputReader;
 
+    /**
+     * Creates a GPA service.
+     *
+     * @param studentManager manager used to find students
+     * @param gradeManager manager used to retrieve grades
+     * @param gradeScale scale used for conversion
+     * @param inputReader reader used for interactive input
+     */
     public GPAService(
             StudentManager studentManager,
             GradeManager gradeManager,
@@ -25,10 +36,17 @@ public final class GPAService {
         this.inputReader = Objects.requireNonNull(inputReader);
     }
 
+    /**
+     * Converts a percentage to a grade point.
+     *
+     * @param percentage percentage grade
+     * @return the converted grade point
+     */
     public GradePoint getGPA(double percentage) {
         return gradeScale.convertPercentageToGPA(percentage);
     }
 
+    /** Interactively calculates and displays a student's GPA. */
     public void calculateStudentGPA() {
         String studentId = inputReader.readRequired(
                 "Enter the student ID to calculate GPA: ");
