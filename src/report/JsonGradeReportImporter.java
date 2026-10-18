@@ -12,7 +12,6 @@ public final class JsonGradeReportImporter implements GradeReportImporter {
     /**
      * Imports a report to a CSV file.
      *
-     * @param report report to export
      * @param file destination file
      * @throws IOException if the file cannot be written
      */

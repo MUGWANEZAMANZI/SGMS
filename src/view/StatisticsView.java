@@ -5,25 +5,35 @@ import manager.StatisticsResult;
 import model.Grade;
 
 import java.util.Map;
+import java.util.function.Supplier;
 
 /**
  * Displays calculated class statistics.
  */
 public class StatisticsView {
-    private final StatisticsCalculator statisticsCalculator;
+    private final Supplier<StatisticsResult> source;
 
     /**
-     * Creates a statistics view.
+     * Creates a statistics view backed by a calculator.
      *
      * @param statisticsCalculator calculator used to obtain statistics
      */
     public StatisticsView(StatisticsCalculator statisticsCalculator) {
-        this.statisticsCalculator = statisticsCalculator;
+        this.source = statisticsCalculator::calculate;
     }
 
-    /** Calculates and displays the current class statistics. */
+    /**
+     * Creates a statistics view backed by a pre-computed result supplier (e.g. a dashboard cache).
+     *
+     * @param source supplier of the latest statistics result
+     */
+    public StatisticsView(Supplier<StatisticsResult> source) {
+        this.source = source;
+    }
+
+    /** Displays the current class statistics, using the cached result when available. */
     public void displayStatistics() {
-        displayStatistics(statisticsCalculator.calculate());
+        displayStatistics(source.get());
     }
 
     /** Displays a previously calculated statistics snapshot. */
