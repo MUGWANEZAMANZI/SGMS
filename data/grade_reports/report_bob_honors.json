@@ -1,0 +1,7 @@
+{
+  "student": "Bob Smith",
+  "overallAverage": 92.40,
+  "coreAverage": 91.33,
+  "electiveAverage": 94.00,
+  "passing": true
+}

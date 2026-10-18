@@ -1,0 +1,7 @@
+[
+  {"name": "Alice Johnson", "age": 20, "email": "alice.johnson@student.edu", "phone": "0712345678", "type": "Regular", "status": "ACTIVE"},
+  {"name": "Bob Smith",     "age": 22, "email": "bob.smith@student.edu",     "phone": "0723456789", "type": "Honors",  "status": "ACTIVE"},
+  {"name": "Carol Davis",   "age": 19, "email": "carol.davis@student.edu",   "phone": "0734567890", "type": "Regular", "status": "ACTIVE"},
+  {"name": "David Wilson",  "age": 21, "email": "david.wilson@student.edu",  "phone": "0745678901", "type": "Honors",  "status": "ACTIVE"},
+  {"name": "Emma Brown",    "age": 23, "email": "emma.brown@student.edu",    "phone": "0756789012", "type": "Regular", "status": "INACTIVE"}
+]

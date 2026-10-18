@@ -24,7 +24,8 @@ import audit.AuditTrail;
 /**
  * Imports grades from CSV files into student and grade managers.
  */
-public class BulkImportService implements CSVParser {
+public class BulkImportService {
+    private static final String COMMA_DELIMITER = ",";
     private final StudentManager studentManager;
     private final GradeManager gradeManager;
 
@@ -46,7 +47,6 @@ public class BulkImportService implements CSVParser {
      * @return a summary of imported and failed rows
      * @throws IOException if the input file or failure log cannot be accessed
      */
-    @Override
     public ImportSummary importCSV(String filePath) throws IOException {
         List<String> failures = new ArrayList<>();
         int total = 0;
@@ -82,8 +82,8 @@ public class BulkImportService implements CSVParser {
                     double value = Double.parseDouble(fields[3].trim());
                     gradeManager.recordGrade(student, subject, value);
                     imported++;
-                } catch (StudentNotFoundException | ImportFormatException
-                         | NumberFormatException exception) {
+                } catch (NumberFormatException
+                         | exceptions.InvalidInputException exception) {
                     failures.add("Row " + rowNumber + ": " + exception.getMessage());
                 }
             }

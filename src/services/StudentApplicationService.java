@@ -1,10 +1,13 @@
 package services;
 
+import exceptions.InvalidInputException;
+import exceptions.StudentNotFoundException;
 import input.InputReader;
 import manager.StudentManager;
 import model.HonorsStudent;
 import model.RegularStudent;
 import model.Student;
+import view.StudentView;
 
 import java.util.Objects;
 
@@ -56,7 +59,7 @@ public class StudentApplicationService {
         IO.println("Student added successfully!");
     }
 
-    /** Displays all stored students and their summaries. */
+    /** Displays all stored students using StudentView. */
     public void viewStudents() {
         IO.println("\n=============== STUDENTS ===============");
 
@@ -66,31 +69,76 @@ public class StudentApplicationService {
             return;
         }
 
-        IO.println("%-8s %-20s %-10s %-10s %-10s".formatted("ID", "NAME", "TYPE", "AVERAGE", "STATUS"));
-        IO.println("--------------------------------------------------------");
-
-        double classTotal = 0;
+        StudentView view = new StudentView();
         for (Student student : students) {
-            double average = student.calculateAverageGrade();
-            classTotal += average;
-            IO.println("%-8s %-20s %-10s %6.2f%%   %s".formatted(
-                    student.getStudentId(),
-                    student.getName(),
-                    student.getStudentType(),
-                    average,
-                    statusText(student)));
+            IO.println("----------------------------------------");
+            view.display(student);
         }
-
-        IO.println("--------------------------------------------------------");
+        IO.println("----------------------------------------");
         IO.println("Total students: " + students.length);
-        IO.println("Class average: %.2f%%".formatted(classTotal / students.length));
     }
 
-
-    private static String statusText(Student student) {
-        if (student.getGrades().length == 0) {
-            return "No grades";
+    /**
+     * Interactively edits an existing student's details.
+     * Fields left blank are kept unchanged.
+     */
+    public void editStudent() {
+        IO.println("\n============= EDIT STUDENT =============");
+        String studentId = inputReader.readRequired("Student ID: ");
+        Student student = studentManager.findStudentById(studentId);
+        if (student == null) {
+            throw new StudentNotFoundException(studentId);
         }
-        return student.isPassing() ? "Passing" : "Failing";
+        IO.println("Editing: " + student.getName() + " (" + student.getStudentId() + ")");
+
+        String name = inputReader.readOptional("Name [" + student.getName() + "]: ");
+        if (!name.isBlank()) {
+            student.setName(name);
+        }
+
+        String ageStr = inputReader.readOptional("Age [" + student.getAge() + "]: ");
+        if (!ageStr.isBlank()) {
+            try {
+                student.setAge(Integer.parseInt(ageStr.trim()));
+            } catch (NumberFormatException e) {
+                throw new InvalidInputException("Age must be a number");
+            }
+        }
+
+        String email = inputReader.readOptional("Email [" + student.getEmail() + "]: ");
+        if (!email.isBlank()) {
+            student.setEmail(email);
+        }
+
+        String phone = inputReader.readOptional("Phone [" + student.getPhone() + "]: ");
+        if (!phone.isBlank()) {
+            student.setPhone(phone);
+        }
+
+        IO.println("Student updated successfully!");
+    }
+
+    /** Interactively sets a student's status to INACTIVE. */
+    public void deactivateStudent() {
+        IO.println("\n============= DEACTIVATE STUDENT =============");
+        String studentId = inputReader.readRequired("Student ID: ");
+        Student student = studentManager.findStudentById(studentId);
+        if (student == null) {
+            throw new StudentNotFoundException(studentId);
+        }
+        student.setStatus(Student.Status.INACTIVE);
+        IO.println(student.getName() + " has been deactivated.");
+    }
+
+    /** Interactively sets a student's status to ACTIVE. */
+    public void activateStudent() {
+        IO.println("\n============= ACTIVATE STUDENT =============");
+        String studentId = inputReader.readRequired("Student ID: ");
+        Student student = studentManager.findStudentById(studentId);
+        if (student == null) {
+            throw new StudentNotFoundException(studentId);
+        }
+        student.setStatus(Student.Status.ACTIVE);
+        IO.println(student.getName() + " has been activated.");
     }
 }

@@ -9,25 +9,19 @@ import validation.ValidationPatterns;
 /**
  * Represents a percentage grade recorded for a student and subject.
  */
-public class Grade {
+public record Grade(String gradeId, String studentId, Subject subject, double value, LocalDate recordedAt) {
 
     private static int nextGradeNumber = 1;
-
-    private final String gradeId;
-    private final String studentId;
-    private final Subject subject;
-    private final double value;
-    private final LocalDate recordedAt;
 
     /**
      * Creates a grade for a student and subject.
      *
      * @param studentId identifier of the student
-     * @param subject subject receiving the grade
-     * @param value percentage value from 0 through 100
+     * @param subject   subject receiving the grade
+     * @param value     percentage value from 0 through 100
      * @throws InvalidInputException if {@code studentId} is blank
      * @throws InvalidGradeException if {@code value} is outside the valid range
-     * @throws NullPointerException if {@code subject} is {@code null}
+     * @throws NullPointerException  if {@code subject} is {@code null}
      */
     public Grade(String studentId, Subject subject, double value) {
         this(studentId, subject, value, LocalDate.now());
@@ -36,9 +30,9 @@ public class Grade {
     /**
      * Creates a grade with a supplied ISO-valid recording date.
      *
-     * @param studentId identifier of the student
-     * @param subject subject receiving the grade
-     * @param value percentage value from 0 through 100
+     * @param studentId  identifier of the student
+     * @param subject    subject receiving the grade
+     * @param value      percentage value from 0 through 100
      * @param recordedAt recording date
      */
     public Grade(String studentId, Subject subject, double value, LocalDate recordedAt) {
@@ -52,11 +46,7 @@ public class Grade {
 
 
         //All checks passed - safe to claim an ID
-        this.gradeId = "GRD%03d".formatted(nextGradeNumber++);
-        this.subject = subject;
-        this.recordedAt = recordedAt;
-        this.studentId = normalizedStudentId;
-        this.value = value;
+        this("GRD%03d".formatted(nextGradeNumber++), normalizedStudentId, subject, value, recordedAt);
 
 
     }
@@ -66,7 +56,8 @@ public class Grade {
      *
      * @return the grade identifier
      */
-    public String getGradeId() {
+    @Override
+    public String gradeId() {
         return gradeId;
     }
 
@@ -75,7 +66,8 @@ public class Grade {
      *
      * @return the student identifier
      */
-    public String getStudentId() {
+    @Override
+    public String studentId() {
         return studentId;
     }
 
@@ -84,7 +76,8 @@ public class Grade {
      *
      * @return the subject
      */
-    public Subject getSubject() {
+    @Override
+    public Subject subject() {
         return subject;
     }
 
@@ -93,7 +86,8 @@ public class Grade {
      *
      * @return the percentage grade
      */
-    public double getValue() {
+    @Override
+    public double value() {
         return value;
     }
 
@@ -102,7 +96,8 @@ public class Grade {
      *
      * @return the recording date
      */
-    public LocalDate getRecordedAt() {
+    @Override
+    public LocalDate recordedAt() {
         return recordedAt;
     }
 
@@ -115,7 +110,9 @@ public class Grade {
         return recordedAt.toString();
     }
 
-    /** Displays the grade details in a formatted row. */
+    /**
+     * Displays the grade details in a formatted row.
+     */
     public void displayGradeDetails() {
         IO.println("%-8s %-22s %-10s %7.2f%%  %-12s".formatted(
                 gradeId,

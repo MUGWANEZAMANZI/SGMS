@@ -82,7 +82,9 @@ public class Main {
              ScheduledGpaProcessor gpaProcessor = new ScheduledGpaProcessor(
                      studentManager,
                      new RankingService(gradeManager, new GPACalculator()),
-                     result -> {})) {
+                     result -> {});
+             ConcurrentReportService concurrentReportService =
+                     new ConcurrentReportService(reportService, 4)) {
             StatisticsView statisticsView = new StatisticsView(dashboard::getLatest);
             dashboard.start(Duration.ofSeconds(5));
             gpaProcessor.start(Duration.ofSeconds(5));
@@ -96,7 +98,10 @@ public class Main {
                 gradeReportView,
                 exportReportView,
                 gpaView,
-                new StudentImportService(studentManager)).start();
+                new StudentImportService(studentManager),
+                concurrentReportService,
+                reportFileService,
+                studentManager).start();
         }
     }
 }

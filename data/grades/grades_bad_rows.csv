@@ -1,0 +1,7 @@
+studentId,subject,type,grade
+STU001,Mathematics,Core,78
+STU001,English,Core,84
+STU999,Science,Core,91
+STU001,Music,Elective,150
+STU001,Art,BadType,88
+STU001,History,Elective,75

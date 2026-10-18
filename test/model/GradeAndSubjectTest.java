@@ -47,9 +47,9 @@ class GradeAndSubjectTest {
         Grade grade = new Grade("STU001",
                 new CoreSubject("Math", "C1"), 75.5);
 
-        assertEquals("STU001", grade.getStudentId());
-        assertEquals(75.5, grade.getValue());
-        assertEquals(grade.getRecordedAt().toString(), grade.formattedDate());
+        assertEquals("STU001", grade.studentId());
+        assertEquals(75.5, grade.value());
+        assertEquals(grade.recordedAt().toString(), grade.formattedDate());
 
         // Capturing the output of displayGradeDetails for testing
         ByteArrayOutputStream output = new ByteArrayOutputStream();

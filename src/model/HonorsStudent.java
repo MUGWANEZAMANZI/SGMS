@@ -1,12 +1,12 @@
 package model;
 
 /**
- * Represents a student eligible for the honors category.
+ * Represents a student eligible for the honors' category.
  */
 public class HonorsStudent extends Student {
 
     /**
-     * Creates an honors student.
+     * Creates an honors' student.
      *
      * @param name student's name
      * @param age student's age
@@ -38,9 +38,4 @@ public class HonorsStudent extends Student {
         return 60.0;
     }
 
-    /** Displays the honors student's identifier and name. */
-    @Override
-    public void displayStudentDetails() {
-        IO.println("%s - %s".formatted(getStudentId(), getName()));
-    }
 }
