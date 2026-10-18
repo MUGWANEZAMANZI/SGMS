@@ -1,6 +1,7 @@
 package model;
 
 import exceptions.InvalidGradeException;
+import exceptions.InvalidInputException;
 import java.time.LocalDate;
 import java.util.Objects;
 import validation.ValidationPatterns;
@@ -46,12 +47,18 @@ public class Grade {
             throw new InvalidGradeException(value);
         }
 
+        Objects.requireNonNull(subject, "Subject cannot be null");
+        Objects.requireNonNull(recordedAt, "Recorded date cannot be null");
+
+
+        //All checks passed - safe to claim an ID
         this.gradeId = "GRD%03d".formatted(nextGradeNumber++);
+        this.subject = subject;
+        this.recordedAt = recordedAt;
         this.studentId = normalizedStudentId;
-        this.subject = Objects.requireNonNull(subject, "model.Subject cannot be null");
         this.value = value;
-        this.recordedAt = Objects.requireNonNull(recordedAt, "Recorded date cannot be null");
-        ValidationPatterns.requireIsoDate(this.recordedAt.toString());
+
+
     }
 
     /**

@@ -46,7 +46,7 @@ public final class ScheduledGpaProcessor implements AutoCloseable {
         }
         scheduler.scheduleWithFixedDelay(
                 this::processSafely,
-                0,
+                interval.toMillis(),
                 interval.toMillis(),
                 TimeUnit.MILLISECONDS);
     }

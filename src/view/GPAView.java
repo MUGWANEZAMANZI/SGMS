@@ -5,6 +5,7 @@ import manager.StudentManager;
 import services.RankingService;
 import services.StudentGPAResult;
 import services.StudentRanking;
+import model.Student;
 
 import java.util.List;
 import java.util.Objects;
@@ -86,9 +87,7 @@ public final class GPAView {
         IO.println("\n" + title);
         IO.println("---------------------------");
         for (StudentRanking ranking : rankings) {
-            double value = useGpa
-                    ? ranking.cumulativeGpa()
-                    : ranking.averageMark();
+            double value = useGpa ? ranking.cumulativeGpa() : ranking.averageMark();
             String suffix = useGpa ? " GPA" : "%";
             IO.println("%d. %s - %.2f%s".formatted(
                     ranking.rank(),
@@ -98,7 +97,7 @@ public final class GPAView {
         }
     }
 
-    private static String statusText(model.Student student) {
+    private static String statusText(Student student) {
         if (student.getGrades().length == 0) {
             return "No grades";
         }

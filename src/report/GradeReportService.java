@@ -73,18 +73,6 @@ public class GradeReportService {
         );
     }
 
-    /**
-     * Creates the report used for export.
-     *
-     * @param studentId identifier of the student
-     * @return the generated report
-     * @throws InvalidInputException if {@code studentId} is blank
-     * @throws StudentNotFoundException if no student has the identifier
-     */
-    public GradeReport exportReport(String studentId) {
-        return createReport(studentId);
-    }
-
     private static double average(double total, int count) {
         return count == 0 ? 0.0 : total / count;
     }
