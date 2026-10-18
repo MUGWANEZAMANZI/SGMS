@@ -28,9 +28,4 @@ public class RegularStudent extends Student {
         return 50.0;
     }
 
-    /** Displays the regular student's identifier and name. */
-    @Override
-    public void displayStudentDetails() {
-        IO.println("%s - %s".formatted(getStudentId(), getName()));
-    }
 }

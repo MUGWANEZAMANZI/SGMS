@@ -21,18 +21,4 @@ public class ElectiveSubject extends Subject {
         return "Elective";
     }
 
-    /**
-     * Indicates whether this subject is mandatory.
-     *
-     * @return always {@code false}
-     */
-    public boolean isMandatory() {
-        return false;
-    }
-
-    /** Displays the elective subject details. */
-    @Override
-    public void displaySubjectDetails() {
-        IO.println("%s (%s) - Elective".formatted(getSubjectName(), getSubjectCode()));
-    }
 }

@@ -56,7 +56,7 @@ public final class GPACalculator implements GradeScale {
 
         double totalGpa = 0.0;
         for (Grade grade : grades) {
-            totalGpa += convertPercentageToGPA(grade.getValue()).gpa();
+            totalGpa += convertPercentageToGPA(grade.value()).gpa();
         }
         return totalGpa / grades.length;
     }

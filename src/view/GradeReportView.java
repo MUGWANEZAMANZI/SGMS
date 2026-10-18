@@ -22,7 +22,6 @@ public final class GradeReportView {
         GradeReport report = reportService.createReport(studentId);
         Student student = report.student();
 
-        IO.println("\nStudent: %s - %s".formatted(student.getStudentId(), student.getName()));
         IO.println("Type: " + student.getStudentType());
         IO.println("Passing grade: %.0f%%".formatted(student.getPassingGrade()));
         IO.println("Overall average: %.2f%%".formatted(report.overallAverage()));

@@ -54,11 +54,11 @@ public class GradeReportService {
         int electiveCount = 0;
 
         for (Grade grade : grades) {
-            if (grade.getSubject() instanceof CoreSubject) {
-                coreTotal += grade.getValue();
+            if (grade.subject() instanceof CoreSubject) {
+                coreTotal += grade.value();
                 coreCount++;
-            } else if (grade.getSubject() instanceof ElectiveSubject) {
-                electiveTotal += grade.getValue();
+            } else if (grade.subject() instanceof ElectiveSubject) {
+                electiveTotal += grade.value();
                 electiveCount++;
             }
         }

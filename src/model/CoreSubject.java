@@ -21,18 +21,4 @@ public class CoreSubject extends Subject {
         return "Core";
     }
 
-    /**
-     * Indicates whether this subject is mandatory.
-     *
-     * @return always {@code true}
-     */
-    public boolean isMandatory() {
-        return true;
-    }
-
-    /** Displays the core subject details. */
-    @Override
-    public void displaySubjectDetails() {
-        IO.println("%s (%s) - Core".formatted(getSubjectName(), getSubjectCode()));
-    }
 }

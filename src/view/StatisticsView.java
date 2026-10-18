@@ -82,8 +82,8 @@ public class StatisticsView {
         }
         IO.println("%s: %.2f%% (%s, %s)".formatted(
                 label,
-                grade.getValue(),
-                grade.getStudentId(),
-                grade.getSubject().getSubjectName()));
+                grade.value(),
+                grade.studentId(),
+                grade.subject().getSubjectName()));
     }
 }

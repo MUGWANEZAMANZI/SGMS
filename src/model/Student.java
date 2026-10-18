@@ -3,7 +3,7 @@ package model;
 import exceptions.CapacityExceededException;
 import exceptions.InvalidInputException;
 
-import java.util.HashSet;
+
 import java.util.Objects;
 import validation.ValidationPatterns;
 
@@ -22,21 +22,23 @@ public abstract class Student {
     private String email;
     private String phone;
     private Status status;
-    private HashSet<String> subjects;
+
 
     protected Student(String name, int age, String email, String phone) {
-        this(name, age, email, phone, new HashSet<>());
-    }
+        String validatedName  = requireNonBlank(name, "Name");
+        int    validatedAge   = validateAge(age);
+        String validatedEmail = ValidationPatterns.requireEmail(email);
+        String validatedPhone = ValidationPatterns.requirePhone(phone);
 
-    protected Student(String name, int age, String email, String phone, HashSet<String> subjects) {
+        // All checks passed — safe to claim an ID
         this.studentId = "STU%03d".formatted(nextStudentNumber++);
-        this.name = requireNonBlank(name, "Name");
-        this.age = validateAge(age);
-        this.email = ValidationPatterns.requireEmail(email);
-        this.phone = ValidationPatterns.requirePhone(phone);
+        this.name   = validatedName;
+        this.age    = validatedAge;
+        this.email  = validatedEmail;
+        this.phone  = validatedPhone;
         this.status = Status.ACTIVE;
-        this.subjects = new HashSet<>(Objects.requireNonNull(subjects, "Subjects cannot be null"));
-    }
+        }
+
 
     /**
      * Returns the generated student identifier.
@@ -177,7 +179,7 @@ public abstract class Student {
 
         double total = 0.0;
         for (int index = 0; index < gradeCount; index++) {
-            total += grades[index].getValue();
+            total += grades[index].value();
         }
         return total / gradeCount;
     }
@@ -204,9 +206,6 @@ public abstract class Student {
      * @return the passing percentage
      */
     public abstract double getPassingGrade();
-
-    /** Displays the student's summary details. */
-    public abstract void displayStudentDetails();
 
     private static String requireNonBlank(String value, String fieldName) {
         if (value == null || value.isBlank()) {

@@ -117,10 +117,27 @@ public class ConsoleInputReader implements InputReader {
         }
     }
 
+    /**
+     * Reads whatever the user typed, trimmed; may be blank.
+     *
+     * @param prompt prompt shown to the user
+     * @return the entered value, possibly blank
+     */
+    @Override
+    public String readOptional(String prompt) {
+        String value = readLine(prompt);
+        return value == null ? "" : value.trim();
+    }
+
     /** Waits for the user to press Enter. */
     @Override
     public void pause(){
         readLine("\nPress Enter to continue...");
+        // Drain any leftover \r or \n that Windows leaves in the buffer after Enter.
+        try {
+            long remaining = System.in.available();
+            if (remaining > 0) System.in.skip(remaining);
+        } catch (java.io.IOException ignored) {}
     }
 
     protected String readLine(String prompt) {

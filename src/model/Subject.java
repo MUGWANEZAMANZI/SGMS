@@ -13,12 +13,10 @@ public abstract class Subject {
 
     protected Subject(String subjectName, String subjectCode) {
         if (subjectName == null || subjectName.isBlank()) {
-            throw new InvalidInputException("model.Subject name cannot be blank");
+            throw new InvalidInputException("Subject name cannot be blank");
         }
-        this.subjectName = subjectName.trim();
         this.subjectCode = ValidationPatterns.requireCourseCode(subjectCode);
-
-
+        this.subjectName = subjectName.trim();
     }
     /**
      * Returns the subject name.
@@ -45,6 +43,4 @@ public abstract class Subject {
      */
     public abstract String getSubjectType();
 
-    /** Displays the subject details. */
-    public abstract void displaySubjectDetails();
 }

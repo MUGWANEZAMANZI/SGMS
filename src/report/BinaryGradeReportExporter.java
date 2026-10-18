@@ -27,10 +27,10 @@ public final class BinaryGradeReportExporter implements GradeReportExporter {
             model.Grade[] grades = report.grades();
             output.writeInt(grades.length);
             for (model.Grade grade : grades) {
-                output.writeUTF(grade.getSubject().getSubjectName());
-                output.writeUTF(grade.getSubject().getSubjectCode());
-                output.writeUTF(grade.getSubject().getSubjectType());
-                output.writeDouble(grade.getValue());
+                output.writeUTF(grade.subject().getSubjectName());
+                output.writeUTF(grade.subject().getSubjectCode());
+                output.writeUTF(grade.subject().getSubjectType());
+                output.writeDouble(grade.value());
             }
         }
     }
