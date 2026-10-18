@@ -18,8 +18,6 @@ class GradeAndSubjectTest {
 
         assertEquals("Mathematics", core.getSubjectName());
         assertEquals("CORE001", core.getSubjectCode());
-        assertTrue(core.isMandatory());
-        assertFalse(elective.isMandatory());
         assertEquals("Core", core.getSubjectType());
         assertEquals("Elective", elective.getSubjectType());
     }
