@@ -1,0 +1,6 @@
+name,age,email,phone,type,status
+Alice Johnson,20,alice.johnson@student.edu,0712345678,Regular,ACTIVE
+Bob Smith,22,bob.smith@student.edu,0723456789,Honors,ACTIVE
+Carol Davis,19,carol.davis@student.edu,0734567890,Regular,ACTIVE
+David Wilson,21,david.wilson@student.edu,0745678901,Honors,ACTIVE
+Emma Brown,23,emma.brown@student.edu,0756789012,Regular,INACTIVE

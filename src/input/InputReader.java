@@ -48,6 +48,14 @@ public interface InputReader {
      */
     String readRequired(String prompt);
 
+    /**
+     * Reads whatever the user typed, possibly blank.
+     *
+     * @param prompt prompt shown to the user
+     * @return the entered value, trimmed; may be blank
+     */
+    String readOptional(String prompt);
+
     /** Waits for the user to continue. */
     void pause();
 }

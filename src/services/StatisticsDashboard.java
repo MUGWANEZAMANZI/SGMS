@@ -11,12 +11,13 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 /**
- * Publishes refreshed class statistics on a background schedule.
+ * Recalculates class statistics on a background schedule and caches the result for retrieval.
  */
 public final class StatisticsDashboard implements AutoCloseable {
     private final StatisticsCalculator calculator;
     private final Consumer<StatisticsResult> publisher;
     private final ScheduledExecutorService scheduler;
+    private volatile StatisticsResult cache;
 
     public StatisticsDashboard(
             StatisticsCalculator calculator,
@@ -31,6 +32,13 @@ public final class StatisticsDashboard implements AutoCloseable {
     }
 
     /**
+     * Returns the most recently calculated statistics, or calculates fresh if not yet available.
+     */
+    public StatisticsResult getLatest() {
+        return cache != null ? cache : calculator.calculate();
+    }
+
+    /**
      * Starts dashboard refreshes.
      *
      * @param interval refresh interval
@@ -42,14 +50,16 @@ public final class StatisticsDashboard implements AutoCloseable {
         }
         scheduler.scheduleWithFixedDelay(
                 this::refreshSafely,
-                0,
+                interval.toMillis(),
                 interval.toMillis(),
                 TimeUnit.MILLISECONDS);
     }
 
     private void refreshSafely() {
         try {
-            publisher.accept(calculator.calculate());
+            StatisticsResult result = calculator.calculate();
+            cache = result;
+            publisher.accept(result);
         } catch (RuntimeException exception) {
             System.err.println("Statistics dashboard refresh failed: "
                     + exception.getMessage());

@@ -12,7 +12,7 @@ import java.util.Objects;
 /**
  * Stores grades and validates grade values.
  */
-public class GradeManager implements Gradable {
+public class GradeManager {
 
     private final Grade[] grades = new Grade[200];
     private int gradeCount;
@@ -48,25 +48,7 @@ public class GradeManager implements Gradable {
         addGrade(grade);
     }
 
-    /**
-     * Validates a grade value.
-     *
-     * @param grade grade value to validate
-     * @return whether the value is valid
-     */
-    @Override
-    public boolean recordGrade(double grade) {
-        return validateGrade(grade);
-    }
-
-    /**
-     * Checks whether a grade is between 0 and 100 inclusive.
-     *
-     * @param grade grade value to validate
-     * @return whether the value is valid
-     */
-    @Override
-    public boolean validateGrade(double grade) {
+    private static boolean validateGrade(double grade) {
         return grade >= 0 && grade <= 100;
     }
 
@@ -80,7 +62,7 @@ public class GradeManager implements Gradable {
         Grade[] result = new Grade[gradeCount];
         int resultCount = 0;
         for (int index = 0; index < gradeCount; index++) {
-            if (grades[index].getStudentId().equalsIgnoreCase(studentId)) {
+            if (grades[index].studentId().equalsIgnoreCase(studentId)) {
                 result[resultCount++] = grades[index];
             }
         }

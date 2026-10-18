@@ -11,7 +11,6 @@ public final class CsvGradeReportImporter implements GradeReportImporter {
     /**
      * Exports a report to a CSV file.
      *
-     * @param report report to export
      * @param file destination file
      * @throws IOException if the file cannot be written
      */

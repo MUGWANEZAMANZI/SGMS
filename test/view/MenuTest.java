@@ -1,48 +1,74 @@
 package view;
 
-import app.ApplicationActions;
+import exceptions.InvalidInputException;
+import exceptions.StudentNotFoundException;
 import input.InputReader;
 import manager.GradeManager;
 import manager.StudentManager;
 import org.junit.jupiter.api.Test;
+import report.GradeReportFileService;
+import report.StudentImportService;
 import services.BulkImportService;
+import services.ConcurrentReportService;
 import services.GradeService;
 import services.StudentApplicationService;
 import services.StudentSearchService;
 
-import static org.mockito.Mockito.*;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.*;
 
 class MenuTest {
 
-    @Test
-    void delegatesGradeReportActionToInjectedApplicationActions() {
-        ApplicationActions actions = mock(ApplicationActions.class);
-        Menu menu = new Menu(
-                mock(StudentApplicationService.class),
-                mock(GradeService.class),
-                mock(StudentSearchService.class),
-                new BulkImportService(new StudentManager(), new GradeManager()),
-                mock(InputReader.class),
-                mock(StatisticsView.class),
-                actions);
+    private StudentManager sharedManager = new StudentManager();
 
-        menu.handleOptions(4);
-
-        verify(actions).viewGradeReport();
+    private Menu buildMenu(
+            StudentApplicationService students,
+            GradeService grades,
+            StudentSearchService search,
+            StatisticsView statistics,
+            GradeReportView gradeReport,
+            ExportReportView exportReport,
+            GPAView gpa) {
+        InputReader reader = mock(InputReader.class);
+        ConcurrentReportService concurrent = mock(ConcurrentReportService.class);
+        when(concurrent.generate(any())).thenReturn(java.util.List.of());
+        return new Menu(students, grades, search,
+                new BulkImportService(sharedManager, new GradeManager()),
+                reader, statistics, gradeReport, exportReport, gpa,
+                null,
+                concurrent,
+                new GradeReportFileService(),
+                sharedManager);
     }
 
     @Test
-    void delegatesEveryApplicationActionAndReturnsFalseOnExit() {
-        ApplicationActions actions = mock(ApplicationActions.class);
+    void delegatesGradeReportViewOnOptionFour() {
+        GradeReportView gradeReportView = mock(GradeReportView.class);
+        Menu menu = buildMenu(
+                mock(StudentApplicationService.class),
+                mock(GradeService.class),
+                mock(StudentSearchService.class),
+                mock(StatisticsView.class),
+                gradeReportView,
+                mock(ExportReportView.class),
+                mock(GPAView.class));
+
+        menu.handleOptions(4);
+
+        verify(gradeReportView).display();
+    }
+
+    @Test
+    void delegatesEveryViewAndReturnsFalseOnExit() {
         StudentApplicationService students = mock(StudentApplicationService.class);
         GradeService grades = mock(GradeService.class);
         StudentSearchService search = mock(StudentSearchService.class);
         StatisticsView statistics = mock(StatisticsView.class);
-        Menu menu = new Menu(students, grades, search,
-                new BulkImportService(new StudentManager(), new GradeManager()),
-                mock(InputReader.class), statistics, actions);
+        GradeReportView gradeReport = mock(GradeReportView.class);
+        ExportReportView exportReport = mock(ExportReportView.class);
+        GPAView gpa = mock(GPAView.class);
+        Menu menu = buildMenu(students, grades, search, statistics, gradeReport, exportReport, gpa);
 
         assertTrue(menu.handleOptions(1));
         assertTrue(menu.handleOptions(2));
@@ -58,23 +84,96 @@ class MenuTest {
         verify(students).addStudent();
         verify(students).viewStudents();
         verify(grades).recordGrade();
-        verify(actions).viewGradeReport();
-        verify(actions).exportGradeReport();
-        verify(actions).calculateStudentGPA();
+        verify(gradeReport).display();
+        verify(exportReport).export();
+        verify(gpa).displayStudentGPA();
         verify(statistics).displayStatistics();
         verify(search).search();
     }
 
     @Test
-    void catchesInputAndImportFailuresWithoutStoppingMenu() {
-        ApplicationActions actions = mock(ApplicationActions.class);
-        doThrow(new exceptions.InvalidInputException("bad input"))
-                .when(actions).calculateStudentGPA();
-        Menu menu = new Menu(mock(StudentApplicationService.class),
-                mock(GradeService.class), mock(StudentSearchService.class),
-                new BulkImportService(new StudentManager(), new GradeManager()),
-                mock(InputReader.class), mock(StatisticsView.class), actions);
+    void catchesInputFailuresWithoutStoppingMenu() {
+        ExportReportView exportReport = mock(ExportReportView.class);
+        doThrow(new InvalidInputException("bad input")).when(exportReport).export();
+        Menu menu = buildMenu(
+                mock(StudentApplicationService.class),
+                mock(GradeService.class),
+                mock(StudentSearchService.class),
+                mock(StatisticsView.class),
+                mock(GradeReportView.class),
+                exportReport,
+                mock(GPAView.class));
 
-        assertTrue(menu.handleOptions(6));
+        assertTrue(menu.handleOptions(5));
+    }
+
+    @Test
+    void option14DelegatesEditStudent() {
+        StudentApplicationService students = mock(StudentApplicationService.class);
+        Menu menu = buildMenu(students,
+                mock(GradeService.class), mock(StudentSearchService.class),
+                mock(StatisticsView.class), mock(GradeReportView.class),
+                mock(ExportReportView.class), mock(GPAView.class));
+
+        assertTrue(menu.handleOptions(14));
+        verify(students).editStudent();
+    }
+
+    @Test
+    void option15DelegatesDeactivateStudent() {
+        StudentApplicationService students = mock(StudentApplicationService.class);
+        Menu menu = buildMenu(students,
+                mock(GradeService.class), mock(StudentSearchService.class),
+                mock(StatisticsView.class), mock(GradeReportView.class),
+                mock(ExportReportView.class), mock(GPAView.class));
+
+        assertTrue(menu.handleOptions(15));
+        verify(students).deactivateStudent();
+    }
+
+    @Test
+    void option16DelegatesActivateStudent() {
+        StudentApplicationService students = mock(StudentApplicationService.class);
+        Menu menu = buildMenu(students,
+                mock(GradeService.class), mock(StudentSearchService.class),
+                mock(StatisticsView.class), mock(GradeReportView.class),
+                mock(ExportReportView.class), mock(GPAView.class));
+
+        assertTrue(menu.handleOptions(16));
+        verify(students).activateStudent();
+    }
+
+    @Test
+    void catchesStudentNotFoundWithoutStoppingMenu() {
+        StudentApplicationService students = mock(StudentApplicationService.class);
+        doThrow(new StudentNotFoundException("STU999")).when(students).editStudent();
+        Menu menu = buildMenu(students,
+                mock(GradeService.class), mock(StudentSearchService.class),
+                mock(StatisticsView.class), mock(GradeReportView.class),
+                mock(ExportReportView.class), mock(GPAView.class));
+
+        assertTrue(menu.handleOptions(14));
+    }
+
+    @Test
+    void option12BatchReportsShowsNoneWhenNoStudents() {
+        Menu menu = buildMenu(
+                mock(StudentApplicationService.class),
+                mock(GradeService.class), mock(StudentSearchService.class),
+                mock(StatisticsView.class), mock(GradeReportView.class),
+                mock(ExportReportView.class), mock(GPAView.class));
+
+        assertTrue(menu.handleOptions(12));
+    }
+
+    @Test
+    void option11StudentImportNotConfiguredReturnsTrue() {
+        Menu menu = buildMenu(
+                mock(StudentApplicationService.class),
+                mock(GradeService.class), mock(StudentSearchService.class),
+                mock(StatisticsView.class), mock(GradeReportView.class),
+                mock(ExportReportView.class), mock(GPAView.class));
+
+        assertTrue(menu.handleOptions(11));
     }
 }

@@ -20,6 +20,15 @@ public final class ApplicationLogger {
     }
 
     /**
+     * Logs a warning message for expected, recoverable conditions.
+     *
+     * @param message the warning message
+     */
+    public static void warning(String message) {
+        LOGGER.log(Level.WARNING, "[{0}] {1}", new Object[]{Instant.now(), message});
+    }
+
+    /**
      * Logs an error message and its exception.
      *
      * @param message the error message

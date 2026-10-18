@@ -34,7 +34,7 @@ public class StatisticsCalculator {
     public StatisticsResult calculate() {
         Student[] students = studentManager.getStudents();
         Grade[] grades = gradeManager.getGrades();
-        double[] values = Arrays.stream(grades).mapToDouble(Grade::getValue).toArray();
+        double[] values = Arrays.stream(grades).mapToDouble(Grade::value).toArray();
         double mean = average(values);
 
         Map<Character, Integer> gradeCounts = new LinkedHashMap<>();
@@ -49,19 +49,19 @@ public class StatisticsCalculator {
         Map<Double, Integer> frequencies = new HashMap<>();
 
         for (Grade grade : grades) {
-            highest = highest == null || grade.getValue() > highest.getValue() ? grade : highest;
-            lowest = lowest == null || grade.getValue() < lowest.getValue() ? grade : lowest;
-            char letter = gradeLetter(grade.getValue());
+            highest = highest == null || grade.value() > highest.value() ? grade : highest;
+            lowest = lowest == null || grade.value() < lowest.value() ? grade : lowest;
+            char letter = gradeLetter(grade.value());
             gradeCounts.compute(letter, (key, count) -> count + 1);
-            frequencies.merge(grade.getValue(), 1, Integer::sum);
+            frequencies.merge(grade.value(), 1, Integer::sum);
 
-            String subjectKey = grade.getSubject().getSubjectName();
-            addTotal(subjectTotals, subjectKey, grade.getValue());
-            addTotal(subjectTotals, grade.getSubject().getSubjectType() + ":" + subjectKey, grade.getValue());
+            String subjectKey = grade.subject().getSubjectName();
+            addTotal(subjectTotals, subjectKey, grade.value());
+            addTotal(subjectTotals, grade.subject().getSubjectType() + ":" + subjectKey, grade.value());
 
-            Student student = findStudent(students, grade.getStudentId());
+            Student student = findStudent(students, grade.studentId());
             if (student != null) {
-                addTotal(studentTypeTotals, student.getStudentType(), grade.getValue());
+                addTotal(studentTypeTotals, student.getStudentType(), grade.value());
             }
         }
 

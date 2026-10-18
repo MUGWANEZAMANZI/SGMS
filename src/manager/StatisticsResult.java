@@ -59,8 +59,8 @@ public class StatisticsResult {
         this.standardDeviation = standardDeviation;
         this.highestGradeRecord = highestGradeRecord;
         this.lowestGradeRecord = lowestGradeRecord;
-        this.highestGrade = highestGradeRecord == null ? 0.0 : highestGradeRecord.getValue();
-        this.lowestGrade = lowestGradeRecord == null ? 0.0 : lowestGradeRecord.getValue();
+        this.highestGrade = highestGradeRecord == null ? 0.0 : highestGradeRecord.value();
+        this.lowestGrade = lowestGradeRecord == null ? 0.0 : lowestGradeRecord.value();
         this.gradeCounts = Collections.unmodifiableMap(gradeCounts);
         this.subjectAverages = Collections.unmodifiableMap(subjectAverages);
         this.studentTypeAverages = Collections.unmodifiableMap(studentTypeAverages);

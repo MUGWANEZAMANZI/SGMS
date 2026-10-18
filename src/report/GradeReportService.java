@@ -54,11 +54,11 @@ public class GradeReportService {
         int electiveCount = 0;
 
         for (Grade grade : grades) {
-            if (grade.getSubject() instanceof CoreSubject) {
-                coreTotal += grade.getValue();
+            if (grade.subject() instanceof CoreSubject) {
+                coreTotal += grade.value();
                 coreCount++;
-            } else if (grade.getSubject() instanceof ElectiveSubject) {
-                electiveTotal += grade.getValue();
+            } else if (grade.subject() instanceof ElectiveSubject) {
+                electiveTotal += grade.value();
                 electiveCount++;
             }
         }
@@ -71,18 +71,6 @@ public class GradeReportService {
                 average(electiveTotal, electiveCount),
                 student.isPassing()
         );
-    }
-
-    /**
-     * Creates the report used for export.
-     *
-     * @param studentId identifier of the student
-     * @return the generated report
-     * @throws InvalidInputException if {@code studentId} is blank
-     * @throws StudentNotFoundException if no student has the identifier
-     */
-    public GradeReport exportReport(String studentId) {
-        return createReport(studentId);
     }
 
     private static double average(double total, int count) {

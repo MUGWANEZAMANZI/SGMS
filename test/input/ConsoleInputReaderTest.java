@@ -67,6 +67,23 @@ class ConsoleInputReaderTest {
     }
 
     @Test
+    void readOptionalReturnsTrimmedValueWhenProvided() {
+        assertEquals("Alice", new TestReader(" Alice ").readOptional("Name: "));
+    }
+
+    @Test
+    void readOptionalReturnsBlankWhenUserPressesEnter() {
+        assertEquals("", new TestReader("").readOptional("Name: "));
+    }
+
+    @Test
+    void readOptionalDoesNotRetryOnBlankInput() {
+        TestReader reader = new TestReader("");
+        reader.readOptional("Name: ");
+        assertEquals(1, reader.readCount);
+    }
+
+    @Test
     void pauseConsumesInput() {
         assertDoesNotThrow(() -> new TestReader("").pause());
     }

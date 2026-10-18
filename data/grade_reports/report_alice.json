@@ -1,0 +1,7 @@
+{
+  "student": "Alice Johnson",
+  "overallAverage": 83.50,
+  "coreAverage": 84.33,
+  "electiveAverage": 80.50,
+  "passing": true
+}

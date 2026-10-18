@@ -15,6 +15,7 @@ out/
 bin/
 !**/src/main/**/bin/
 !**/src/test/**/bin/
+.idea/
 
 ### NetBeans ###
 /nbproject/private/
@@ -31,3 +32,5 @@ bin/
 
 ## Generated files
 /grade_reports
+target/
+imports/import_log_*.txt

@@ -9,8 +9,9 @@ import model.RegularStudent;
 import model.Student;
 import org.junit.jupiter.api.Test;
 import report.GradeReportService;
-import services.GradeService;
-import services.StudentSearchService;
+import services.RankingService;
+import view.GPAView;
+import view.GradeReportView;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
@@ -22,7 +23,7 @@ import static org.mockito.Mockito.when;
 class MainTest {
 
     @Test
-    void calculatesGpaAndDisplaysClassRank() {
+    void gpaViewCalculatesGpaAndDisplaysClassRank() {
         StudentManager students = new StudentManager();
         GradeManager grades = new GradeManager();
         Student student = new RegularStudent(
@@ -33,20 +34,17 @@ class MainTest {
         InputReader input = mock(InputReader.class);
         when(input.readRequired("Enter the student ID to calculate GPA: "))
                 .thenReturn(student.getStudentId());
-        Main main = new Main(students, grades, input,
-                new GradeService(students, grades, input),
-                new StudentSearchService(students, input),
-                new GPACalculator(),
-                new GradeReportService(students, grades));
+        GPAView gpaView = new GPAView(students, input,
+                new RankingService(grades, new GPACalculator()));
 
-        String output = captureOutput(main::calculateStudentGPA);
+        String output = captureOutput(gpaView::displayStudentGPA);
 
         assertTrue(output.contains("Cumulative GPA: 4.00 / 4.00"));
         assertTrue(output.contains("Class rank: 1 of 1"));
     }
 
     @Test
-    void viewsEmptyGradeReport() {
+    void gradeReportViewShowsNoGradesMessage() {
         StudentManager students = new StudentManager();
         GradeManager grades = new GradeManager();
         Student student = new RegularStudent(
@@ -56,13 +54,10 @@ class MainTest {
         InputReader input = mock(InputReader.class);
         when(input.readRequired("Enter the student ID to view the grade report: "))
                 .thenReturn(student.getStudentId());
-        Main main = new Main(students, grades, input,
-                new GradeService(students, grades, input),
-                new StudentSearchService(students, input),
-                new GPACalculator(),
+        GradeReportView gradeReportView = new GradeReportView(input,
                 new GradeReportService(students, grades));
 
-        assertTrue(captureOutput(main::viewGradeReport)
+        assertTrue(captureOutput(gradeReportView::display)
                 .contains("No grades recorded for this student."));
     }
 

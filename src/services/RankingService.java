@@ -41,8 +41,8 @@ public final class RankingService {
         List<StudentGPAResult.SubjectGPAResult> subjectResults = new ArrayList<>();
         for (Grade grade : grades) {
             subjectResults.add(new StudentGPAResult.SubjectGPAResult(
-                    grade.getSubject().getSubjectName(),
-                    gpaCalculator.convertPercentageToGPA(grade.getValue())));
+                    grade.subject().getSubjectName(),
+                    gpaCalculator.convertPercentageToGPA(grade.value())));
         }
 
         return new StudentGPAResult(

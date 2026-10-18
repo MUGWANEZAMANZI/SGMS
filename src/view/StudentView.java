@@ -1,5 +1,6 @@
 package view;
 
+import model.HonorsStudent;
 import model.Student;
 
 /**
@@ -8,17 +9,19 @@ import model.Student;
 public final class StudentView {
 
     /**
-     * Displays a student's identifier, details, average, and status.
+     * Displays a student's identifier, details, average, status, and honors eligibility if applicable.
      *
      * @param student student to display
      */
     public void display(Student student) {
-        System.out.println("model.Student ID: " + student.getStudentId());
-        System.out.println("Name: " + student.getName());
-        System.out.println("Type: " + student.getStudentType());
-        System.out.println("Average: %.2f%%".formatted(
-                student.calculateAverageGrade()
-        ));
-        System.out.println("Status: " + student.getStatus());
+        IO.println("Student ID: " + student.getStudentId());
+        IO.println("Name: " + student.getName());
+        IO.println("Type: " + student.getStudentType());
+        IO.println("Average: %.2f%%".formatted(student.calculateAverageGrade()));
+        IO.println("Status: " + student.getStatus());
+        if (student instanceof HonorsStudent h) {
+            String eligibility = h.checkHonorsEligibility() ? "Maintained" : "NOT maintained";
+            IO.println("Honors status: " + eligibility);
+        }
     }
 }

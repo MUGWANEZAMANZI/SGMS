@@ -38,24 +38,20 @@ public final class ConcurrentReportService implements AutoCloseable {
      */
     public List<GradeReport> generate(Student[] students) {
         Objects.requireNonNull(students);
-        try {
-            var tasks = Arrays.stream(students)
-                    .map(student -> workers.submit(
-                            () -> reportService.createReport(student.getStudentId())))
-                    .toList();
-            return tasks.stream().map(future -> {
-                try {
-                    return future.get();
-                } catch (InterruptedException exception) {
-                    Thread.currentThread().interrupt();
-                    throw new IllegalStateException("Report generation interrupted", exception);
-                } catch (ExecutionException exception) {
-                    throw new IllegalStateException("Report generation failed", exception.getCause());
-                }
-            }).toList();
-        } finally {
-            // Individual tasks are completed or cancelled by the caller through close().
-        }
+        var tasks = Arrays.stream(students)
+                .map(student -> workers.submit(
+                        () -> reportService.createReport(student.getStudentId())))
+                .toList();
+        return tasks.stream().map(future -> {
+            try {
+                return future.get();
+            } catch (InterruptedException exception) {
+                Thread.currentThread().interrupt();
+                throw new IllegalStateException("Report generation interrupted", exception);
+            } catch (ExecutionException exception) {
+                throw new IllegalStateException("Report generation failed", exception.getCause());
+            }
+        }).toList();
     }
 
     @Override
