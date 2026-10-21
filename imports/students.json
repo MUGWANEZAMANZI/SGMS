@@ -1,0 +1,26 @@
+[
+  {
+    "name": "Luca Bianchi",
+    "age": 23,
+    "email": "luca.bianchi@university.edu",
+    "phone": "+27744567890",
+    "type": "Honors",
+    "status": "ACTIVE"
+  },
+  {
+    "name": "Sofia Ndlovu",
+    "age": 20,
+    "email": "sofia.ndlovu@university.edu",
+    "phone": "+27755678901",
+    "type": "Regular",
+    "status": "ACTIVE"
+  },
+  {
+    "name": "Carlos Mendes",
+    "age": 24,
+    "email": "carlos.mendes@university.edu",
+    "phone": "+27766789012",
+    "type": "Regular",
+    "status": "ACTIVE"
+  }
+]
