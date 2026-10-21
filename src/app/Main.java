@@ -32,24 +32,15 @@ public class Main {
     private final GradeReportService reportService;
     private final GradeReportFileService reportFileService;
 
-    public Main(
-            StudentManager studentManager,
-            GradeManager gradeManager,
-            InputReader inputReader,
-            GradeService gradeService,
-            StudentSearchService studentSearchService,
-            GPACalculator gpaCalculator,
-            GradeReportService reportService) {
+    public Main(StudentManager studentManager, GradeManager gradeManager, InputReader inputReader, GradeService gradeService, StudentSearchService studentSearchService, GPACalculator gpaCalculator, GradeReportService reportService) {
 
         this.studentManager = studentManager;
         this.gradeManager = gradeManager;
         this.inputReader = inputReader;
         this.gradeService = gradeService;
         this.studentSearchService = studentSearchService;
-        this.gpaView = new GPAView(
-                studentManager,
-                inputReader,
-                new RankingService(gradeManager, gpaCalculator));
+        this.gpaView = new GPAView(studentManager, inputReader, new RankingService(gradeManager, gpaCalculator));
+
         this.reportService = reportService;
         this.reportFileService = new GradeReportFileService();
     }
@@ -70,11 +61,11 @@ public class Main {
     }
 
     private void start() {
-        StudentApplicationService studentApplicationService =
-                new StudentApplicationService(studentManager, inputReader);
+        StudentApplicationService studentApplicationService = new StudentApplicationService(studentManager, inputReader);
         GradeReportView gradeReportView = new GradeReportView(inputReader, reportService);
-        ExportReportView exportReportView =
-                new ExportReportView(inputReader, reportService, reportFileService);
+        ExportReportView exportReportView = new ExportReportView(inputReader, reportService, reportFileService);
+        BulkImportService bulkImportService = new BulkImportService(studentManager, gradeManager);
+        StudentImportService studentImportService = new StudentImportService(studentManager);
 
         try (StatisticsDashboard dashboard = new StatisticsDashboard(
                 new StatisticsCalculator(studentManager, gradeManager),
@@ -84,21 +75,26 @@ public class Main {
                      new RankingService(gradeManager, new GPACalculator()),
                      result -> {});
              ConcurrentReportService concurrentReportService =
-                     new ConcurrentReportService(reportService, 4)) {
+                     new ConcurrentReportService(reportService, 4);
+             ImportWatcher importWatcher = new ImportWatcher(
+                     java.nio.file.Path.of("imports"),
+                     bulkImportService,
+                     studentImportService)) {
             StatisticsView statisticsView = new StatisticsView(dashboard::getLatest);
             dashboard.start(Duration.ofSeconds(5));
             gpaProcessor.start(Duration.ofSeconds(5));
+            importWatcher.start();
             new Menu(
                 studentApplicationService,
                 gradeService,
                 studentSearchService,
-                new BulkImportService(studentManager, gradeManager),
+                bulkImportService,
                 inputReader,
                 statisticsView,
                 gradeReportView,
                 exportReportView,
                 gpaView,
-                new StudentImportService(studentManager),
+                studentImportService,
                 concurrentReportService,
                 reportFileService,
                 studentManager).start();

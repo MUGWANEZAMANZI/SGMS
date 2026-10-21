@@ -12,6 +12,7 @@ import exceptions.FileExportException;
 import exceptions.InvalidInputException;
 
 import java.util.Objects;
+import java.util.regex.PatternSyntaxException;
 import cache.ThreadSafeLruCache;
 import java.time.Duration;
 
@@ -65,8 +66,9 @@ public final class StudentSearchService {
         IO.println("2. By Name");
         IO.println("3. By Grade Range");
         IO.println("4. By Student Type");
+        IO.println("5. By Pattern (Regex)");
 
-        int option = inputReader.readInt("Select search option: ", 1, 4);
+        int option = inputReader.readInt("Select search option: ", 1, 5);
         Student[] results;
 
         switch (option) {
@@ -96,6 +98,16 @@ public final class StudentSearchService {
                 int type = inputReader.readInt("Select type: ", 1, 2);
                 results = studentSearch.findStudentsByType(
                         type == 1 ? "Regular" : "Honors");
+            }
+            case 5 -> {
+                String pattern = inputReader.readRequired(
+                        "Enter regex pattern (e.g. John|Jane, ^STU00): ");
+                try {
+                    results = searchByPattern(pattern);
+                } catch (PatternSyntaxException exception) {
+                    throw new InvalidInputException(
+                            "Invalid regex pattern: " + exception.getDescription());
+                }
             }
             default -> throw new InvalidInputException(
                     "Unsupported search option: " + option);

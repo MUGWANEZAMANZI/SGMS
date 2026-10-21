@@ -44,7 +44,7 @@ class MockitoServiceIntegrationTest {
     void searchServiceUsesSearchDependencyAndDisplaysMatchingStudent() {
         Student student = new RegularStudent(
                 "Alice", 20, "alice@example.com", "0712345678");
-        when(inputReader.readInt("Select search option: ", 1, 4)).thenReturn(1);
+        when(inputReader.readInt("Select search option: ", 1, 5)).thenReturn(1);
         when(inputReader.readRequired("Enter student ID: ")).thenReturn("STU001");
         when(searchable.findStudentById("STU001")).thenReturn(student);
 

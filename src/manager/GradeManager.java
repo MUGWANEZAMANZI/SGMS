@@ -7,7 +7,10 @@ import model.Student;
 import model.Subject;
 
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 
 /**
  * Stores grades and validates grade values.
@@ -16,6 +19,7 @@ public class GradeManager {
 
     private final Grade[] grades = new Grade[200];
     private int gradeCount;
+    private final Set<String> uniqueCourses = new HashSet<>();
 
     /**
      * Adds a grade to the manager.
@@ -29,6 +33,16 @@ public class GradeManager {
             throw new CapacityExceededException("model.Grade capacity has been reached");
         }
         grades[gradeCount++] = Objects.requireNonNull(grade, "model.Grade cannot be null");
+        uniqueCourses.add(grade.subject().getSubjectName());
+    }
+
+    /**
+     * Returns the set of unique course names that have been graded.
+     *
+     * @return unmodifiable set of course names
+     */
+    public synchronized Set<String> getUniqueCourses() {
+        return Collections.unmodifiableSet(uniqueCourses);
     }
 
     /**

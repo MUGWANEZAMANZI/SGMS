@@ -105,7 +105,7 @@ class StudentSearchServiceTest {
     void searchDisplaysNoResultsWithoutRequestingAnAction() {
         Searchable search = mock(Searchable.class);
         InputReader input = mock(InputReader.class);
-        when(input.readInt("Select search option: ", 1, 4)).thenReturn(1);
+        when(input.readInt("Select search option: ", 1, 5)).thenReturn(1);
         when(input.readRequired("Enter student ID: ")).thenReturn("STU999");
 
         new StudentSearchService(search, input).search();
@@ -120,7 +120,7 @@ class StudentSearchServiceTest {
         Student student = new RegularStudent(
                 "Export Me", 20, "export@example.com", "0712345678");
         InputReader input = mock(InputReader.class);
-        when(input.readInt("Select search option: ", 1, 4)).thenReturn(1);
+        when(input.readInt("Select search option: ", 1, 5)).thenReturn(1);
         when(input.readRequired("Enter student ID: ")).thenReturn(student.getStudentId());
         when(input.readInt("Select action: ", 1, 4)).thenReturn(2);
         when(search.findStudentById(student.getStudentId())).thenReturn(student);

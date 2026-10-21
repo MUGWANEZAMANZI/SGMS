@@ -11,7 +11,7 @@ By completing this project, you will be able to:
 * Implement modern file I/O operations using NIO.2 API and Stream processing to handle multiple file formats (CSV, JSON, binary), with proper resource management and functional transformations for data import/export
 * Create comprehensive input validation using regular expressions to validate student IDs, email addresses, phone numbers, and other structured data formats, ensuring data integrity across the system
 * Design and implement thread-safe concurrent operations for background tasks such as batch processing, automated report generation, and real-time statistics updates using appropriate synchronization strategies and Executor framework
-* Optimize application performance by analyzing collection performance characteristics, implementing efficient data access patterns, and ensuring thread safety in multi-threaded operations
+* Optimize application performance by analyzing collection performance characteristics, implementing efficient data access patterns, and ensuring thread safety in multithreaded operations
 
 ---
 

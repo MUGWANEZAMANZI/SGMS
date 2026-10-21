@@ -547,14 +547,14 @@ test: add unit tests for statistics calculator
 - [ ] Single Responsibility Principle followed
 - [ ] Proper dependency injection
 - [ ] Consistent naming conventions
-- [ ] Comprehensive JavaDoc comments
+- [ ] Comprehensive Javadoc comments
 - [ ] No hardcoded values (use constants)
 
 ### Documentation
 
 - [ ] README with setup and testing instructions
 - [ ] CHANGELOG documenting all features
-- [ ] JavaDoc for all public methods
+- [ ] Javadoc for all public methods
 - [ ] Test execution guide
 - [ ] Git workflow documentation
 
