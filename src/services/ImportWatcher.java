@@ -1,5 +1,6 @@
 package services;
 
+import input.ConsoleSync;
 import logging.ApplicationLogger;
 import report.StudentImportService;
 
@@ -81,16 +82,20 @@ public final class ImportWatcher implements AutoCloseable {
         try {
             if (name.contains("grades") && name.endsWith(".csv")) {
                 ImportSummary summary = bulkImportService.importCSV(file.toString());
-                ApplicationLogger.info("Auto-imported grades from " + file.getFileName()
-                        + ": " + summary.importedRows() + "/" + summary.totalRows() + " rows");
+                String msg = summary.importedRows() + "/" + summary.totalRows()
+                        + " grade rows imported from " + file.getFileName();
+                ApplicationLogger.info(msg);
+                ConsoleSync.printBackground(msg);
             } else if (name.endsWith(".csv") || name.endsWith(".json") || name.endsWith(".bin")) {
                 int count = studentImportService.importStudents(file);
-                ApplicationLogger.info("Auto-imported " + count
-                        + " students from " + file.getFileName());
+                String msg = count + " students imported from " + file.getFileName();
+                ApplicationLogger.info(msg);
+                ConsoleSync.printBackground(msg);
             }
         } catch (IOException | RuntimeException exception) {
-            ApplicationLogger.error(
-                    "Auto-import failed for " + file.getFileName(), exception);
+            String msg = "Import failed for " + file.getFileName() + ": " + exception.getMessage();
+            ApplicationLogger.error(msg, exception);
+            ConsoleSync.printBackground(msg);
         }
     }
 

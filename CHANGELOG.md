@@ -12,6 +12,44 @@ use semantic versioning where applicable.
 This release upgrades the system to an enterprise-grade application. Every
 feature below maps directly to the Student Grade Mgt III specification.
 
+### Console I/O — Background Notification Without Input Disruption
+
+A background thread (the `ImportWatcher`) and the main input thread share the
+same console. Previously, `java.util.logging` wrote directly to the console and
+its output appeared inline with the user's input prompt, breaking the UI.
+
+**How it was fixed:**
+
+- `ApplicationLogger` now configures a `FileHandler` on startup, writing all
+  log output exclusively to `logs/app.log`. Every `ConsoleHandler` is removed
+  from the root JUL logger so nothing from `java.util.logging` ever reaches
+  the console.
+- `ConsoleSync` (new, `input` package) is the shared lock between threads.
+  It holds a `volatile String activePrompt` that the main thread updates before
+  each blocking read, and exposes `printBackground(message)` for background
+  threads to call safely.
+- `ConsoleInputReader.readLine()` calls `ConsoleSync.setActivePrompt(prompt)`
+  immediately before `IO.readln()`, so the background side always knows what
+  prompt to reprint.
+- `ImportWatcher.processFile()` calls both `ApplicationLogger` (→ file) and
+  `ConsoleSync.printBackground()` (→ console) on every success and failure.
+
+**Result — before and after:**
+
+```
+# Before
+Choose an option: Oct 21, 2026 10:46:02 AM logging.ApplicationLogger info
+INFO: [2026-10-21T08:46:02Z] Auto-imported 3 students from students.csv
+
+# After
+Choose an option:
+[Auto-import] 3 students imported from students.csv
+Choose an option: _
+```
+
+The notification appears on its own line, the prompt is reprinted below it,
+and the user's cursor is ready without any disruption.
+
 ### Collections & Data Structures
 
 - `StudentManager` uses `LinkedHashMap<String, Student>` for O(1) lookup by

@@ -141,6 +141,7 @@ public class ConsoleInputReader implements InputReader {
     }
 
     protected String readLine(String prompt) {
+        ConsoleSync.setActivePrompt(prompt);
         return IO.readln(prompt);
     }
 }

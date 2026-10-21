@@ -1,0 +1,10 @@
+studentId,subject,type,grade
+STU001,Mathematics,Core,87
+STU001,Physics,Core,91
+STU001,English Literature,Elective,76
+STU002,Mathematics,Core,95
+STU002,Computer Science,Core,98
+STU002,Music Theory,Elective,88
+STU003,Mathematics,Core,72
+STU003,Biology,Core,68
+STU003,Art,Elective,80
