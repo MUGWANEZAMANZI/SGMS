@@ -82,14 +82,14 @@ public class Menu {
         options.put(7, "Bulk Import Grades");
         options.put(8, "View Class Statistics");
         options.put(9, "Search Students");
-        options.put(10, "Exit");
-        options.put(11, "Import Students");
-        options.put(12, "Generate Batch Reports");
-        options.put(13, "Import Grade Report");
-        options.put(14, "Edit Student");
-        options.put(15, "Deactivate Student");
-        options.put(16, "Activate Student");
-        options.put(17, "Full Import Pipeline");
+        options.put(10, "Import Students");
+        options.put(11, "Generate Batch Reports");
+        options.put(12, "Import Grade Report");
+        options.put(13, "Edit Student");
+        options.put(14, "Deactivate Student");
+        options.put(15, "Activate Student");
+        options.put(16, "Full Import Pipeline");
+        options.put(17, "Exit");
     }
 
     /** Starts the interactive menu loop. */
@@ -143,7 +143,7 @@ public class Menu {
                 }
                 case 8 -> statisticsView.displayStatistics();
                 case 9 -> studentSearchService.search();
-                case 11 -> {
+                case 10 -> {
                     if (studentImportService == null) {
                         IO.println("Student import is not configured.");
                         break;
@@ -153,7 +153,7 @@ public class Menu {
                     int imported = studentImportService.importStudents(Path.of(path));
                     IO.println(imported + " students imported successfully.");
                 }
-                case 12 -> {
+                case 11 -> {
                     Student[] students = studentManager.getStudents();
                     if (students.length == 0) {
                         IO.println("No students registered.");
@@ -166,7 +166,7 @@ public class Menu {
                         IO.println(report.generateTextReport());
                     }
                 }
-                case 13 -> {
+                case 12 -> {
                     String path = inputReader.readRequired(
                             "Enter report file path (.csv, .json, or .bin): ");
                     ImportedGradeReport imported = reportFileService.importReport(Path.of(path));
@@ -183,10 +183,10 @@ public class Menu {
                         }
                     }
                 }
-                case 14 -> studentApplicationService.editStudent();
-                case 15 -> studentApplicationService.deactivateStudent();
-                case 16 -> studentApplicationService.activateStudent();
-                case 17 -> {
+                case 13 -> studentApplicationService.editStudent();
+                case 14 -> studentApplicationService.deactivateStudent();
+                case 15 -> studentApplicationService.activateStudent();
+                case 16 -> {
                     IO.println("\n========= FULL IMPORT PIPELINE =========");
                     if (studentImportService == null) {
                         IO.println("Student import is not configured.");
@@ -199,7 +199,7 @@ public class Menu {
                     String gradesPath = inputReader.readRequired("Enter grades CSV file path: ");
                     bulkImportService.importCSV(gradesPath);
                 }
-                case 10 -> {
+                case 17 -> {
                     IO.println("\nThank you for using the Student Grade Management System!");
                     IO.println("Goodbye!");
                     return false;
