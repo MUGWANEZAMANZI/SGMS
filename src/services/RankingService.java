@@ -10,6 +10,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
+import java.util.TreeMap;
 
 /**
  * Calculates student GPA data and creates mark- and GPA-based rankings.
@@ -71,9 +72,23 @@ public final class RankingService {
      * @return GPA ranking
      */
     public List<StudentRanking> rankByGpa(Student[] students) {
-        return rank(students, Comparator
-                .comparingDouble(StudentRanking::cumulativeGpa)
-                .reversed());
+        Objects.requireNonNull(students, "Students cannot be null");
+        TreeMap<Double, List<StudentGPAResult>> byGpa = new TreeMap<>(Comparator.reverseOrder());
+        for (Student student : students) {
+            StudentGPAResult result = calculateStudentGPA(student);
+            byGpa.computeIfAbsent(result.cumulativeGpa(), k -> new ArrayList<>()).add(result);
+        }
+        List<StudentRanking> ranked = new ArrayList<>();
+        int position = 1;
+        for (List<StudentGPAResult> tied : byGpa.values()) {
+            for (StudentGPAResult result : tied.stream()
+                    .sorted(Comparator.comparing(r -> r.student().getStudentId()))
+                    .toList()) {
+                ranked.add(new StudentRanking(
+                        position++, result.student(), result.averageMark(), result.cumulativeGpa()));
+            }
+        }
+        return List.copyOf(ranked);
     }
 
     private List<StudentRanking> rank(
