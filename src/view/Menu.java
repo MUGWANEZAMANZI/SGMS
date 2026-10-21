@@ -214,6 +214,9 @@ public class Menu {
                  | FileExportException exception) {
             ApplicationLogger.error("Menu operation failed", exception);
             IO.println("\nInput error: " + exception.getMessage());
+        } catch (IllegalArgumentException exception) {
+            ApplicationLogger.warning("Invalid argument: " + exception.getMessage());
+            IO.println("\nInvalid input: " + exception.getMessage());
         } catch (IOException e) {
             ApplicationLogger.error("File operation failed", e);
             IO.println("\nCould not complete file operation: " + e.getMessage());
